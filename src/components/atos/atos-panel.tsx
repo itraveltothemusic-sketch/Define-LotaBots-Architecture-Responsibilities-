@@ -17,6 +17,7 @@ import { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Brain, Send, X, Trash2, Sparkles } from 'lucide-react';
 import { useAtosStore } from '@/stores/atos-store';
+import { AtosQuickActions } from './atos-quick-actions';
 
 export function AtosPanel() {
   const {
@@ -107,8 +108,11 @@ export function AtosPanel() {
         </div>
       </div>
 
+      {/* Quick Actions */}
+      {messages.length <= 1 && <AtosQuickActions />}
+
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: 'calc(100vh - 170px)' }}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ height: messages.length <= 1 ? 'calc(100vh - 340px)' : 'calc(100vh - 170px)' }}>
         {messages.map(msg => (
           <div
             key={msg.id}

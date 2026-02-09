@@ -21,6 +21,7 @@ import { cn, formatCurrency, formatDate, severityColor, severityBg } from '@/lib
 import { PROPERTY_STATUS_CONFIG, ROUTES } from '@/lib/constants';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
+import { EvidenceTimeline } from '@/components/properties/evidence-timeline';
 import { properties, inspections, insuranceClaims, assignments } from '@/lib/mock-data';
 import { useAtosStore } from '@/stores/atos-store';
 import {
@@ -282,6 +283,9 @@ export default function PropertyDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Evidence Timeline */}
+      <EvidenceTimeline propertyId={propertyId} />
     </div>
   );
 }

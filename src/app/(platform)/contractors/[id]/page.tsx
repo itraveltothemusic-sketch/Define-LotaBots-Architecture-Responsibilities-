@@ -13,15 +13,13 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { cn, formatCurrency, formatDate } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
-import { StatusBadge } from '@/components/ui/status-badge';
 import { ProgressBar } from '@/components/ui/progress-bar';
 import { contractors, assignments } from '@/lib/mock-data';
 import { useAtosStore } from '@/stores/atos-store';
 import {
   ArrowLeft,
-  HardHat,
   Star,
   ShieldCheck,
   ShieldAlert,
@@ -55,7 +53,6 @@ export default function ContractorDetailPage() {
 
   const contractorAssignments = assignments.filter(a => a.contractorId === contractorId);
   const activeAssignments = contractorAssignments.filter(a => !['completed', 'verified'].includes(a.status));
-  const completedAssignments = contractorAssignments.filter(a => ['completed', 'verified'].includes(a.status));
 
   return (
     <div className="space-y-6">

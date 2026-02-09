@@ -10,7 +10,6 @@
 import Link from 'next/link';
 import {
   Shield,
-  Building2,
   TrendingUp,
   Brain,
   ArrowRight,

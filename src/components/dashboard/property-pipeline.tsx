@@ -10,7 +10,7 @@
 'use client';
 
 import Link from 'next/link';
-import { cn, formatCurrency } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import { PROPERTY_STATUS_CONFIG, ROUTES } from '@/lib/constants';
 import { StatusBadge } from '@/components/ui/status-badge';
 import type { Property } from '@/types';

@@ -19,7 +19,7 @@ import { StatusBadge } from '@/components/ui/status-badge';
 import { DataTable } from '@/components/ui/data-table';
 import { insuranceClaims } from '@/lib/mock-data';
 import { useAtosStore } from '@/stores/atos-store';
-import { Shield, Plus, Filter, AlertTriangle, DollarSign, Clock, CheckCircle2 } from 'lucide-react';
+import { Shield, Plus, Filter, AlertTriangle, DollarSign, CheckCircle2 } from 'lucide-react';
 import type { InsuranceClaim } from '@/types';
 
 export default function InsurancePage() {

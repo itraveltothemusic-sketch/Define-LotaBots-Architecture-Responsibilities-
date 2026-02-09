@@ -9,7 +9,7 @@
 
 import { useAuthStore } from '@/stores/auth-store';
 import { ROLE_CONFIG } from '@/lib/constants';
-import { User, Bell, Shield, Database, Brain, Building2 } from 'lucide-react';
+import { User, Bell, Brain } from 'lucide-react';
 
 export default function SettingsPage() {
   const { user } = useAuthStore();

@@ -14,8 +14,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { ATOS_CONFIG } from '@/lib/constants';
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

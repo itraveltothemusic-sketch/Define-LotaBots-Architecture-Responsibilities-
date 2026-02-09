@@ -35,6 +35,12 @@ const navItems = [
     description: 'Central command',
   },
   {
+    label: 'Intelligence',
+    href: ROUTES.intelligence,
+    icon: Brain,
+    description: 'Deep analytics',
+  },
+  {
     label: 'Properties',
     href: ROUTES.properties,
     icon: Building2,

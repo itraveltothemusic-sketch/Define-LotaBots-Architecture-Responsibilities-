@@ -22,7 +22,6 @@ import {
   ArrowLeft,
   Shield,
   Building2,
-  DollarSign,
   User,
   Calendar,
   FileText,

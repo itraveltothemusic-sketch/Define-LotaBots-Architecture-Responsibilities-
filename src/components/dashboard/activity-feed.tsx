@@ -51,7 +51,7 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
         <p className="text-xs text-slate-500 mt-0.5">Latest actions across all modules</p>
       </div>
       <div className="divide-y divide-slate-50">
-        {activities.map((activity, index) => {
+        {activities.map((activity) => {
           const Icon = typeIcons[activity.type];
           const colorClass = typeColors[activity.type];
 

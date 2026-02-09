@@ -16,11 +16,9 @@ import { equityOutcomes } from '@/lib/mock-data';
 import { useAtosStore } from '@/stores/atos-store';
 import {
   ArrowLeft,
-  TrendingUp,
   ArrowUpRight,
   CheckCircle2,
   Building2,
-  DollarSign,
 } from 'lucide-react';
 
 export default function EquityDetailPage() {

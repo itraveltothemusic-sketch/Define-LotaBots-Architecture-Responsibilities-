@@ -21,8 +21,6 @@ import type {
   ActivityEntry,
   DashboardMetrics,
   Inspection,
-  Evidence,
-  CarrierInteraction,
 } from '@/types';
 
 // ─── Current User ──────────────────────────────────────────────

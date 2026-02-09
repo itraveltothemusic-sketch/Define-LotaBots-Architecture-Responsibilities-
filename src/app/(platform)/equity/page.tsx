@@ -21,8 +21,7 @@ import { ROUTES } from '@/lib/constants';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { equityOutcomes } from '@/lib/mock-data';
 import { useAtosStore } from '@/stores/atos-store';
-import { TrendingUp, ArrowUpRight, Building2, DollarSign, BarChart3, CheckCircle2 } from 'lucide-react';
-import type { EquityOutcome } from '@/types';
+import { TrendingUp, ArrowUpRight, BarChart3, CheckCircle2 } from 'lucide-react';
 
 const equityStatusConfig: Record<string, { label: string; color: string; bgColor: string }> = {
   calculating: { label: 'Calculating', color: 'text-amber-700',   bgColor: 'bg-amber-100' },
@@ -96,7 +95,6 @@ export default function EquityPage() {
       <div className="space-y-4">
         {equityOutcomes.map(outcome => {
           const statusCfg = equityStatusConfig[outcome.status];
-          const netBenefit = outcome.insurancePayout - outcome.repairCost;
 
           return (
             <div

@@ -24,6 +24,10 @@ const pageTitles: Record<string, { title: string; subtitle: string }> = {
     title: 'Intelligence Center',
     subtitle: 'Central command for all property intelligence operations',
   },
+  '/intelligence': {
+    title: 'Intelligence Deep Dive',
+    subtitle: 'Cross-module analytics and forensic intelligence',
+  },
   '/properties': {
     title: 'Forensic Property Module',
     subtitle: 'Property cases, inspections, and damage documentation',
