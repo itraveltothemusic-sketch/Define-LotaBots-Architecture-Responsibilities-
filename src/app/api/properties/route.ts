@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { ensureApiSession } from "@/lib/auth/api";
 import {
   listDamageClassifications,
   listEvidence,
@@ -9,6 +10,11 @@ import {
 import { generateModuleGuidance } from "@/lib/intelligence/atos";
 
 export async function GET() {
+  const unauthorized = await ensureApiSession();
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   const [properties, inspections, evidence, damage, guidance] = await Promise.all([
     listPropertyProfiles(),
     listInspectionRecords(),

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { ensureApiSession } from "@/lib/auth/api";
 import {
   listCarrierInteractions,
   listClaims,
@@ -8,6 +9,11 @@ import {
 import { generateModuleGuidance } from "@/lib/intelligence/atos";
 
 export async function GET() {
+  const unauthorized = await ensureApiSession();
+  if (unauthorized) {
+    return unauthorized;
+  }
+
   const [claims, interactions, discrepancies, guidance] = await Promise.all([
     listClaims(),
     listCarrierInteractions(),

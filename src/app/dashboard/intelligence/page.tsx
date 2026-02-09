@@ -27,6 +27,10 @@ export default async function IntelligenceCenterPage() {
   const timeline = [...evidence]
     .sort((left, right) => right.capturedAt.localeCompare(left.capturedAt))
     .slice(0, 6);
+  const payoutCaptureRatio =
+    snapshot.totalClaimSubmittedUsd > 0
+      ? snapshot.totalPayoutUsd / snapshot.totalClaimSubmittedUsd
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -46,7 +50,7 @@ export default async function IntelligenceCenterPage() {
         <KpiCard
           label="Submitted Claims"
           value={formatCurrency(snapshot.totalClaimSubmittedUsd)}
-          trend={`Payout captured ${formatPercent(snapshot.totalPayoutUsd / snapshot.totalClaimSubmittedUsd, 0)}`}
+          trend={`Payout captured ${formatPercent(payoutCaptureRatio, 0)}`}
         />
         <KpiCard
           label="Evidence Verification"
