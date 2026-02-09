@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum EvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  MEASUREMENT
+  NOTE
+}
+
+enum Peril {
+  HAIL
+  WIND
+  HURRICANE
+}
+
+enum WorkflowStatus {
+  INTAKE
+  INSPECTION
+  CLAIM
+  EXECUTION
+  OUTCOME
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users      User[]
+  properties Property[]
+  auditLog   AuditEvent[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  orgId        String
+  email        String   @unique
+  name         String
+  role         Role
+  passwordHash String?  // nullable to support future SSO / SCIM provisioning
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  org        Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  auditEvents AuditEvent[] @relation("AuditActor")
+  evidence    EvidenceItem[] @relation("EvidenceCreator")
+
+  @@index([orgId])
+  @@index([role])
+}
+
+model Property {
+  id               String         @id @default(cuid())
+  orgId            String
+  name             String
+  address          String
+  peril            Peril
+  reportedLossDate DateTime
+  status           WorkflowStatus @default(INTAKE)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  org      Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  evidence EvidenceItem[]
+
+  @@index([orgId])
+  @@index([status])
+  @@index([peril])
+}
+
+model EvidenceItem {
+  id         String       @id @default(cuid())
+  propertyId String
+  createdById String?
+  type       EvidenceType
+  title      String
+  notes      String?
+  tags       String[]     @default([])
+  capturedAt DateTime
+  createdAt  DateTime     @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdBy User?   @relation("EvidenceCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([propertyId])
+  @@index([createdById])
+  @@index([type])
+  @@index([capturedAt])
+}
+
+model AuditEvent {
+  id         String   @id @default(cuid())
+  orgId      String
+  actorUserId String?
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  org   Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  actor User?        @relation("AuditActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([actorUserId])
+  @@index([entityType])
+}
+

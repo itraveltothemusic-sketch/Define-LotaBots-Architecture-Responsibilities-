@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import bcrypt from "bcryptjs";
 import { EB_DEMO_MODE } from "@/lib/env";
 import { DEMO_USERS, roleLabel } from "@/lib/auth/demo-users";
 import { createSessionCookie } from "@/lib/auth/session";
+import { prisma } from "@/server/db/prisma";
 
 const LoginSchema = z.object({
   email: z.string().email(),
@@ -23,8 +25,36 @@ async function loginAction(formData: FormData) {
     redirect("/login?error=invalid");
   }
 
+  const returnTo = parsed.data.returnTo;
+
   if (!EB_DEMO_MODE) {
-    redirect("/login?error=demo_disabled");
+    // Production path: database-backed auth.
+    if (!process.env.DATABASE_URL) {
+      redirect("/login?error=db_not_configured");
+    }
+
+    const user = await prisma().user.findUnique({
+      where: { email: parsed.data.email.toLowerCase() },
+    });
+
+    if (!user?.passwordHash) {
+      redirect("/login?error=bad_credentials");
+    }
+
+    const ok = await bcrypt.compare(parsed.data.password, user.passwordHash);
+    if (!ok) {
+      redirect("/login?error=bad_credentials");
+    }
+
+    await createSessionCookie({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
+
+    if (returnTo && returnTo.startsWith("/app")) redirect(returnTo);
+    redirect("/app");
   }
 
   const match = DEMO_USERS.find(
@@ -44,7 +74,6 @@ async function loginAction(formData: FormData) {
     role: match.role,
   });
 
-  const returnTo = parsed.data.returnTo;
   if (returnTo && returnTo.startsWith("/app")) {
     redirect(returnTo);
   }
@@ -122,6 +151,8 @@ export default async function LoginPage(props: {
                   ? "Invalid email or password."
                   : error === "demo_disabled"
                     ? "Demo mode is disabled. Configure production auth to sign in."
+                    : error === "db_not_configured"
+                      ? "Database auth is enabled, but DATABASE_URL is not configured."
                     : "Please check your inputs and try again."}
               </div>
             ) : null}
