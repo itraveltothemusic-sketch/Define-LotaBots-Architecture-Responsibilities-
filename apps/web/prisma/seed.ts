@@ -1,4 +1,11 @@
-import { PrismaClient, Role, EvidenceType, VerificationStatus } from "@prisma/client";
+import {
+  PrismaClient,
+  Role,
+  EvidenceType,
+  VerificationStatus,
+  ClaimStatus,
+  InteractionChannel,
+} from "@prisma/client";
 import { hashPassword } from "../src/server/security/password";
 
 /**
@@ -73,10 +80,35 @@ async function main() {
     },
   });
 
+  await prisma.claim.upsert({
+    where: { id: "seed-claim-1" },
+    update: { status: ClaimStatus.OPEN },
+    create: {
+      id: "seed-claim-1",
+      propertyId: property.id,
+      carrierName: "Example Carrier (seed)",
+      claimNumber: "CLM-0000001",
+      status: ClaimStatus.OPEN,
+      lossDate: new Date(),
+      interactions: {
+        create: [
+          {
+            occurredAt: new Date(),
+            channel: InteractionChannel.EMAIL,
+            summary:
+              "Seed interaction: request carrier acknowledgement letter and adjuster estimate; capture all attachments for scope comparison.",
+            createdByUserId: internal.id,
+          },
+        ],
+      },
+    },
+  });
+
   console.log("Seed complete:", {
     internalUserId: internal.id,
     ownerUserId: owner.id,
     propertyId: property.id,
+    claimId: "seed-claim-1",
   });
 }
 

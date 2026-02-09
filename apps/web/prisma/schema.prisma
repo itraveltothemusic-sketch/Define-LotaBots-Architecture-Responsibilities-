@@ -34,6 +34,25 @@ enum VerificationStatus {
   REJECTED
 }
 
+enum ClaimStatus {
+  DRAFT
+  OPEN
+  SUBMITTED
+  UNDER_REVIEW
+  PARTIAL_PAYMENT
+  SETTLED
+  CLOSED
+}
+
+enum InteractionChannel {
+  EMAIL
+  PHONE
+  IN_PERSON
+  PORTAL
+  LETTER
+  OTHER
+}
+
 model User {
   id           String    @id @default(cuid())
   email        String    @unique
@@ -50,6 +69,7 @@ model User {
   // Domain relations
   propertiesOwned Property[]     @relation("PropertiesOwned")
   evidenceCreated EvidenceItem[] @relation("EvidenceCreatedBy")
+  carrierInteractionsCreated CarrierInteraction[] @relation("CarrierInteractionCreatedBy")
 }
 
 model Property {
@@ -66,6 +86,7 @@ model Property {
   owner     User?    @relation("PropertiesOwned", fields: [ownerId], references: [id], onDelete: SetNull)
 
   evidence  EvidenceItem[]
+  claims    Claim[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -90,6 +111,36 @@ model EvidenceItem {
   createdByUserId    String?
   createdByUser      User?              @relation("EvidenceCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
   createdAt          DateTime           @default(now())
+}
+
+model Claim {
+  id          String      @id @default(cuid())
+  propertyId  String
+  property    Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  carrierName String
+  claimNumber String?
+  status      ClaimStatus @default(OPEN)
+  lossDate    DateTime?
+
+  interactions CarrierInteraction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CarrierInteraction {
+  id         String             @id @default(cuid())
+  claimId    String
+  claim      Claim              @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  occurredAt DateTime           @default(now())
+  channel    InteractionChannel @default(EMAIL)
+  summary    String
+
+  createdByUserId String?
+  createdByUser   User? @relation("CarrierInteractionCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt       DateTime @default(now())
 }
 
 // ----------------------------
