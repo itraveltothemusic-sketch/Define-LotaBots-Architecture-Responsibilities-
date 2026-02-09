@@ -1,5 +1,6 @@
 import { SignJWT, jwtVerify } from "jose";
 
+import { APP_ROLES } from "@/lib/auth/roles";
 import type { SessionUser } from "@/types/domain";
 
 const encoder = new TextEncoder();
@@ -28,8 +29,28 @@ export async function verifySessionToken(token: string): Promise<SessionUser | n
       algorithms: ["HS256"],
     });
 
-    return (payload as SessionToken).user;
+    const user = (payload as { user?: unknown }).user;
+    if (!isSessionUser(user)) {
+      return null;
+    }
+
+    return user;
   } catch {
     return null;
   }
+}
+
+function isSessionUser(user: unknown): user is SessionUser {
+  if (!user || typeof user !== "object") {
+    return false;
+  }
+
+  const candidate = user as Partial<SessionUser>;
+  return (
+    typeof candidate.id === "string" &&
+    typeof candidate.name === "string" &&
+    typeof candidate.email === "string" &&
+    typeof candidate.role === "string" &&
+    APP_ROLES.includes(candidate.role)
+  );
 }

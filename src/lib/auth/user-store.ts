@@ -80,8 +80,12 @@ export async function validateUserCredentials(
     return null;
   }
 
-  const { salt: _salt, passwordHash: _passwordHash, ...sessionUser } = user;
-  return sessionUser;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  };
 }
 
 export function getBootstrapUsers() {

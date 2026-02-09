@@ -2,12 +2,12 @@ import { DASHBOARD_NAVIGATION } from "@/config/navigation";
 import type { AppRole } from "@/lib/auth/roles";
 
 export function hasModuleAccess(role: AppRole, href: string): boolean {
-  const module = DASHBOARD_NAVIGATION.find((item) => item.href === href);
-  if (!module) {
+  const navItem = DASHBOARD_NAVIGATION.find((item) => item.href === href);
+  if (!navItem) {
     return false;
   }
 
-  return module.roles.includes(role);
+  return navItem.roles.includes(role);
 }
 
 export function getNavigationForRole(role: AppRole) {
