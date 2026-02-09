@@ -1,0 +1,241 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum PropertyStatus {
+  MONITORING
+  ACTIVE_CLAIM
+  RESTORING
+  RESOLVED
+}
+
+enum SeverityLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum EvidenceKind {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  NOTE
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  FLAGGED
+}
+
+enum ClaimStage {
+  NOTICE_OF_LOSS
+  DOCUMENT_COLLECTION
+  ADJUSTER_REVIEW
+  SCOPE_NEGOTIATION
+  PARTIAL_PAYOUT
+  CLOSED
+}
+
+enum OnboardingStatus {
+  IN_PROGRESS
+  VERIFIED
+  RESTRICTED
+}
+
+enum AssignmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  AWAITING_VERIFICATION
+  VERIFIED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Property {
+  id                 String         @id
+  label              String
+  address            String
+  city               String
+  state              String
+  postalCode         String
+  assetClass         String
+  yearBuilt          Int
+  grossSquareFeet    Int
+  occupancyRate      Float
+  weatherEventDate   DateTime
+  baselineValuation  Decimal
+  currentValuation   Decimal
+  status             PropertyStatus
+  confidenceScore    Float
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  inspections        Inspection[]
+  evidenceItems      Evidence[]
+  claims             Claim[]
+  scopeAssignments   ScopeAssignment[]
+  equityOutcomes     EquityOutcome[]
+  equityNarratives   EquityNarrativeReport[]
+}
+
+model Inspection {
+  id               String      @id
+  propertyId       String
+  inspectionDate   DateTime
+  inspector        String
+  summary          String
+  categories       String[]
+  severity         SeverityLevel
+  estimatedLossUsd Decimal
+  isPeerReviewed   Boolean
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  property         Property    @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  evidenceItems    Evidence[]
+}
+
+model Evidence {
+  id                 String             @id
+  propertyId         String
+  inspectionId       String?
+  title              String
+  kind               EvidenceKind
+  capturedAt         DateTime
+  capturedBy         String
+  verificationStatus VerificationStatus
+  chainOfCustodyRef  String
+  note               String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  property           Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  inspection         Inspection?        @relation(fields: [inspectionId], references: [id], onDelete: SetNull)
+}
+
+model Claim {
+  id                     String               @id
+  propertyId             String
+  carrier                String
+  policyNumber           String
+  claimNumber            String               @unique
+  stage                  ClaimStage
+  claimedAmountUsd       Decimal
+  approvedAmountUsd      Decimal
+  reserveAmountUsd       Decimal
+  lastCarrierTouchpoint  DateTime
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  property               Property             @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  interactions           CarrierInteraction[]
+  scopeComparisons       ScopeComparisonLine[]
+}
+
+model CarrierInteraction {
+  id               String   @id
+  claimId          String
+  occurredAt       DateTime
+  channel          String
+  summary          String
+  owner            String
+  requiresFollowUp Boolean
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  claim            Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+}
+
+model ScopeComparisonLine {
+  id                 String   @id
+  claimId            String
+  lineItem           String
+  insurerQuantity    Float
+  contractorQuantity Float
+  insurerUnitCostUsd Decimal
+  contractorUnitCostUsd Decimal
+  discrepancyType    String
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  claim              Claim    @relation(fields: [claimId], references: [id], onDelete: Cascade)
+}
+
+model Contractor {
+  id               String           @id
+  companyName      String
+  trade            String
+  onboardingStatus OnboardingStatus
+  insuranceVerified Boolean
+  licenseVerified   Boolean
+  qualityScore      Float
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  assignments       ScopeAssignment[]
+}
+
+model ScopeAssignment {
+  id                   String           @id
+  propertyId           String
+  contractorId         String
+  workstream           String
+  targetCompletionDate DateTime
+  progressPercent      Int
+  status               AssignmentStatus
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  property             Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  contractor           Contractor       @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+  complianceChecks     ComplianceCheckpoint[]
+}
+
+model ComplianceCheckpoint {
+  id           String   @id
+  assignmentId String
+  requirement  String
+  status       String
+  validatedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  assignment   ScopeAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+}
+
+model EquityOutcome {
+  id                   String   @id
+  propertyId           String
+  valuationBeforeUsd   Decimal
+  valuationAfterUsd    Decimal
+  claimRequestedUsd    Decimal
+  claimPaidUsd         Decimal
+  capexOutOfPocketUsd  Decimal
+  projectedNOIUpliftUsd Decimal
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  property             Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model EquityNarrativeReport {
+  id               String   @id
+  propertyId       String
+  title            String
+  generatedAt      DateTime
+  executiveSummary String
+  confidence       Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  property         Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
