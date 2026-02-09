@@ -1,0 +1,53 @@
+{
+  "name": "equity-builders",
+  "version": "1.0.0",
+  "description": "Forensic Property Intelligence Platform for Storm-Damaged Commercial Properties",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "next": "^14.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.3",
+    "@types/node": "^20.11.5",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "tailwindcss": "^3.4.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33",
+    "pg": "^8.11.3",
+    "@neondatabase/serverless": "^0.9.0",
+    "drizzle-orm": "^0.29.3",
+    "drizzle-kit": "^0.20.14",
+    "bcryptjs": "^2.4.3",
+    "@types/bcryptjs": "^2.4.6",
+    "jsonwebtoken": "^9.0.2",
+    "@types/jsonwebtoken": "^9.0.5",
+    "zod": "^3.22.4",
+    "date-fns": "^3.3.1",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.323.0",
+    "sharp": "^0.33.2",
+    "react-dropzone": "^14.2.3",
+    "recharts": "^2.10.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^14.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
