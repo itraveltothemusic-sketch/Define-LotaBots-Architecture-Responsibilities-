@@ -1,0 +1,267 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// WHY enums: consistent, auditable state transitions.
+enum MembershipRole {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum PropertyStatus {
+  INTAKE
+  INSPECTING
+  DOCUMENTING
+  CLAIM_ACTIVE
+  EXECUTION
+  EQUITY_REPORTED
+  ARCHIVED
+}
+
+enum EvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  NOTE
+}
+
+enum ClaimStatus {
+  DRAFT
+  FILED
+  UNDER_REVIEW
+  RFI
+  NEGOTIATION
+  SETTLED
+  CLOSED
+}
+
+enum InteractionChannel {
+  EMAIL
+  PHONE
+  PORTAL
+  MEETING
+  OTHER
+}
+
+enum AuditActorType {
+  USER
+  SYSTEM
+}
+
+enum AuditEventType {
+  AUTH_SIGNUP
+  AUTH_SIGNIN
+  PROPERTY_CREATED
+  INSPECTION_RECORDED
+  EVIDENCE_ADDED
+  CLAIM_CREATED
+  CLAIM_UPDATED
+}
+
+model Organization {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  memberships Membership[]
+  properties  Property[]
+  contractors Contractor[]
+  auditEvents AuditEvent[]
+
+  @@index([createdAt])
+}
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  email        String       @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  memberships  Membership[]
+  auditEvents  AuditEvent[]
+
+  @@index([createdAt])
+}
+
+model Membership {
+  id        String         @id @default(uuid()) @db.Uuid
+  orgId     String         @db.Uuid
+  userId    String         @db.Uuid
+  role      MembershipRole
+  createdAt DateTime       @default(now())
+
+  org       Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([orgId, userId])
+  @@index([userId])
+}
+
+model Property {
+  id          String         @id @default(uuid()) @db.Uuid
+  orgId       String         @db.Uuid
+  status      PropertyStatus @default(INTAKE)
+  displayName String
+
+  address1    String
+  address2    String?
+  city        String
+  region      String // state/province
+  postalCode  String
+  country     String         @default("US")
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  org         Organization   @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  inspections Inspection[]
+  evidence    Evidence[]
+  claims      Claim[]
+  assignments ScopeAssignment[]
+  equity      EquityReport?
+
+  @@index([orgId, createdAt])
+  @@index([status])
+}
+
+model Inspection {
+  id            String   @id @default(uuid()) @db.Uuid
+  propertyId    String   @db.Uuid
+  performedAt   DateTime
+  inspectorName String
+  summary       String
+  createdAt     DateTime @default(now())
+
+  property      Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, performedAt])
+}
+
+model Evidence {
+  id          String       @id @default(uuid()) @db.Uuid
+  propertyId  String       @db.Uuid
+  type        EvidenceType
+  title       String
+  description String?
+  capturedAt  DateTime?
+
+  // Integrity & provenance signals.
+  sha256      String?
+  sourceUrl   String?
+  storageKey  String?
+
+  createdAt   DateTime     @default(now())
+
+  property    Property     @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, createdAt])
+  @@index([type])
+}
+
+model Claim {
+  id          String     @id @default(uuid()) @db.Uuid
+  propertyId  String     @db.Uuid
+  status      ClaimStatus @default(DRAFT)
+  carrier     String
+  claimNumber String?
+  openedAt    DateTime?
+  closedAt    DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  property    Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  interactions CarrierInteraction[]
+
+  @@index([propertyId, createdAt])
+  @@index([status])
+}
+
+model CarrierInteraction {
+  id         String             @id @default(uuid()) @db.Uuid
+  claimId    String             @db.Uuid
+  occurredAt DateTime
+  channel    InteractionChannel @default(OTHER)
+  notes      String
+  createdAt  DateTime           @default(now())
+
+  claim      Claim              @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@index([claimId, occurredAt])
+}
+
+model Contractor {
+  id           String      @id @default(uuid()) @db.Uuid
+  orgId        String      @db.Uuid
+  companyName  String
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  org          Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  assignments  ScopeAssignment[]
+
+  @@index([orgId, createdAt])
+}
+
+model ScopeAssignment {
+  id           String   @id @default(uuid()) @db.Uuid
+  propertyId   String   @db.Uuid
+  contractorId String   @db.Uuid
+  title        String
+  notes        String?
+  assignedAt   DateTime @default(now())
+  completedAt  DateTime?
+
+  property     Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  contractor   Contractor @relation(fields: [contractorId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, assignedAt])
+  @@index([contractorId, assignedAt])
+}
+
+model EquityReport {
+  id          String   @id @default(uuid()) @db.Uuid
+  propertyId  String   @unique @db.Uuid
+  beforeValue Int?
+  afterValue  Int?
+  payout      Int?
+  narrative   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id          String         @id @default(uuid()) @db.Uuid
+  orgId       String?        @db.Uuid
+  userId      String?        @db.Uuid
+  actorType   AuditActorType
+  eventType   AuditEventType
+  resourceType String?
+  resourceId  String?
+  ip          String?
+  userAgent   String?
+  metadata    Json?
+  createdAt   DateTime       @default(now())
+
+  org         Organization?  @relation(fields: [orgId], references: [id], onDelete: SetNull)
+  user        User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([orgId, createdAt])
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+}
+
