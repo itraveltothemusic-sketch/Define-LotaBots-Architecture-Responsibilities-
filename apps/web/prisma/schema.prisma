@@ -1,0 +1,134 @@
+// Equity Builders — Postgres schema (Neon)
+//
+// Design goals:
+// - Trust and auditability: evidence is first-class and always attributable.
+// - Explainability: ATOS reasoning must be grounded in persisted facts.
+// - Security: role-based access is enforced at the application layer; the DB enforces integrity.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum EvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  NOTE
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  VERIFIED
+  REJECTED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  role         Role      @default(OWNER)
+  passwordHash String?   // Used only for Credentials auth (hashed; never store plaintext).
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Auth.js / NextAuth relations
+  accounts Account[]
+  sessions Session[]
+
+  // Domain relations
+  propertiesOwned Property[]     @relation("PropertiesOwned")
+  evidenceCreated EvidenceItem[] @relation("EvidenceCreatedBy")
+}
+
+model Property {
+  id           String   @id @default(cuid())
+  displayName  String
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  region       String?
+  postalCode   String?
+  country      String?  @default("US")
+
+  ownerId   String?
+  owner     User?    @relation("PropertiesOwned", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  evidence  EvidenceItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EvidenceItem {
+  id                 String             @id @default(cuid())
+  propertyId         String
+  property           Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  type               EvidenceType
+  title              String
+  description        String?
+  // For now we store an object reference (S3/GCS/etc). Later we’ll add signed URLs and storage providers.
+  uri                String?
+  capturedAt         DateTime?
+
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  // Optional integrity anchor (e.g., SHA-256 of the binary). This is crucial for forensic workflows.
+  contentSha256      String?
+
+  createdByUserId    String?
+  createdByUser      User?              @relation("EvidenceCreatedBy", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdAt          DateTime           @default(now())
+}
+
+// ----------------------------
+// Auth.js / NextAuth models
+// ----------------------------
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
