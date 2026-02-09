@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+/*
+ * Equity Builders — Global Design System
+ * 
+ * Design philosophy: Forensic precision meets executive authority.
+ * Colors convey trust (deep navy), intelligence (electric blue), 
+ * and verified outcomes (emerald green).
+ */
+
+@theme {
+  /* Brand Colors — chosen for authority, trust, and precision */
+  --color-brand-50: #EFF6FF;
+  --color-brand-100: #DBEAFE;
+  --color-brand-200: #BFDBFE;
+  --color-brand-300: #93C5FD;
+  --color-brand-400: #60A5FA;
+  --color-brand-500: #3B82F6;
+  --color-brand-600: #2563EB;
+  --color-brand-700: #1D4ED8;
+  --color-brand-800: #1E40AF;
+  --color-brand-900: #1E3A8A;
+  --color-brand-950: #172554;
+
+  /* Navy — primary background for authority */
+  --color-navy-50: #F0F4F8;
+  --color-navy-100: #D9E2EC;
+  --color-navy-200: #BCCCDC;
+  --color-navy-300: #9FB3C8;
+  --color-navy-400: #829AB1;
+  --color-navy-500: #627D98;
+  --color-navy-600: #486581;
+  --color-navy-700: #334E68;
+  --color-navy-800: #243B53;
+  --color-navy-900: #102A43;
+  --color-navy-950: #0A1929;
+
+  /* Forensic Green — verified outcomes and positive signals */
+  --color-forensic-50: #ECFDF5;
+  --color-forensic-100: #D1FAE5;
+  --color-forensic-200: #A7F3D0;
+  --color-forensic-300: #6EE7B7;
+  --color-forensic-400: #34D399;
+  --color-forensic-500: #10B981;
+  --color-forensic-600: #059669;
+  --color-forensic-700: #047857;
+  --color-forensic-800: #065F46;
+  --color-forensic-900: #064E3B;
+
+  /* Alert — risk signals and warnings */
+  --color-alert-50: #FFF7ED;
+  --color-alert-100: #FFEDD5;
+  --color-alert-200: #FED7AA;
+  --color-alert-300: #FDBA74;
+  --color-alert-400: #FB923C;
+  --color-alert-500: #F97316;
+  --color-alert-600: #EA580C;
+  --color-alert-700: #C2410C;
+  --color-alert-800: #9A3412;
+
+  /* Danger — critical issues requiring immediate attention */
+  --color-danger-50: #FEF2F2;
+  --color-danger-100: #FEE2E2;
+  --color-danger-200: #FECACA;
+  --color-danger-300: #FCA5A5;
+  --color-danger-400: #F87171;
+  --color-danger-500: #EF4444;
+  --color-danger-600: #DC2626;
+  --color-danger-700: #B91C1C;
+  --color-danger-800: #991B1B;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Base layer overrides for forensic aesthetic */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-navy-950 text-navy-100;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Scrollbar styling for forensic feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-navy-900;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-navy-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-navy-500;
+  }
+}
+
+/* Utility animations */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(59, 130, 246, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
