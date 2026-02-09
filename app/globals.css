@@ -1,0 +1,164 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Roboto Mono', monospace;
+}
+
+@layer base {
+  * {
+    @apply border-dark-200;
+  }
+  
+  body {
+    @apply bg-white text-dark-900 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+  
+  h1 {
+    @apply text-4xl lg:text-5xl;
+  }
+  
+  h2 {
+    @apply text-3xl lg:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl lg:text-3xl;
+  }
+}
+
+@layer components {
+  /* Forensic Intelligence UI Patterns */
+  .forensic-card {
+    @apply bg-white border border-dark-200 rounded-lg shadow-sm hover:shadow-forensic transition-all duration-200;
+  }
+  
+  .forensic-card-header {
+    @apply border-b border-dark-200 px-6 py-4;
+  }
+  
+  .forensic-card-body {
+    @apply px-6 py-4;
+  }
+  
+  .forensic-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .forensic-badge-primary {
+    @apply bg-primary-100 text-primary-800 border border-primary-200;
+  }
+  
+  .forensic-badge-success {
+    @apply bg-accent-100 text-accent-800 border border-accent-200;
+  }
+  
+  .forensic-badge-warning {
+    @apply bg-warning-100 text-warning-800 border border-warning-200;
+  }
+  
+  .forensic-badge-danger {
+    @apply bg-red-100 text-red-800 border border-red-200;
+  }
+  
+  .forensic-input {
+    @apply w-full px-4 py-2.5 border border-dark-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all;
+  }
+  
+  .forensic-button {
+    @apply inline-flex items-center justify-center px-6 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .forensic-button-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md;
+  }
+  
+  .forensic-button-secondary {
+    @apply bg-dark-100 text-dark-900 hover:bg-dark-200 focus:ring-dark-500 border border-dark-300;
+  }
+  
+  .forensic-button-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  
+  /* ATOS AI Assistant Styling */
+  .atos-panel {
+    @apply bg-gradient-to-br from-primary-50 to-accent-50 border border-primary-200 rounded-lg p-6 shadow-forensic;
+  }
+  
+  .atos-message {
+    @apply bg-white rounded-lg p-4 shadow-sm border border-primary-100;
+  }
+  
+  /* Timeline styling for documentation */
+  .timeline-item {
+    @apply relative pl-8 pb-8 border-l-2 border-dark-200 last:border-0 last:pb-0;
+  }
+  
+  .timeline-item::before {
+    @apply absolute left-0 top-0 w-4 h-4 rounded-full bg-primary-500 border-4 border-white transform -translate-x-2.5;
+    content: '';
+  }
+  
+  /* Dashboard grid patterns */
+  .dashboard-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+  }
+  
+  .dashboard-stats-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4;
+  }
+  
+  /* Metric display */
+  .metric-card {
+    @apply forensic-card forensic-card-body;
+  }
+  
+  .metric-label {
+    @apply text-sm text-dark-600 font-medium mb-1;
+  }
+  
+  .metric-value {
+    @apply text-3xl font-bold text-dark-900;
+  }
+  
+  .metric-change {
+    @apply text-sm font-medium mt-2;
+  }
+  
+  .metric-change-positive {
+    @apply text-accent-600;
+  }
+  
+  .metric-change-negative {
+    @apply text-red-600;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-dark-100 rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-dark-300 rounded-full hover:bg-dark-400;
+  }
+}
