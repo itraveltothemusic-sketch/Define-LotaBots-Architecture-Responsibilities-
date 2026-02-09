@@ -50,6 +50,21 @@ npm run dev
 
 Then open `http://localhost:3000`.
 
+## Database (Postgres / Neon)
+
+Database-backed auth and persistence are scaffolded with Prisma + Neon driver adapter.
+
+- Copy `apps/web/.env.example` to `apps/web/.env.local`
+- Set `DATABASE_URL` and `SESSION_SECRET`
+- Run:
+
+```bash
+npm --workspace apps/web run db:migrate
+npm --workspace apps/web run db:seed
+```
+
+Then set `EB_DEMO_MODE=0` to enforce database-backed sign-in.
+
 ## Documentation
 
 - `docs/`: platform architecture and operating principles
