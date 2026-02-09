@@ -4,7 +4,6 @@ import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
 declare global {
-  // eslint-disable-next-line no-var
   var __prisma: PrismaClient | undefined;
 }
 
