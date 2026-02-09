@@ -2,12 +2,34 @@
  * Root Layout
  * 
  * The top-level layout wrapping every page. Provides:
- * - Global styles and fonts
+ * - Global styles and fonts (Inter via next/font)
  * - Meta tags for SEO
  * - Dark theme by default
  */
 import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
+
+/**
+ * Inter — Primary typeface for the platform.
+ * Clean, professional, and highly readable at all sizes.
+ * Used for all UI text, headings, and body copy.
+ */
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+/**
+ * JetBrains Mono — Monospace typeface for data display.
+ * Used for claim numbers, financial figures, and code.
+ */
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Equity Builders — Forensic Property Intelligence Platform",
@@ -29,16 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
-      <head>
-        {/* Inter font from Google Fonts for clean, professional typography */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="en" className={`dark ${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="font-sans antialiased">
         {children}
       </body>
