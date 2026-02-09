@@ -53,6 +53,12 @@ export default async function PropertyDetailPage({
           <Link href="/properties">
             <Button variant="ghost">All properties</Button>
           </Link>
+          <Link href={`/properties/${propertyId}/evidence/new`}>
+            <Button>Add evidence</Button>
+          </Link>
+          <Link href={`/properties/${propertyId}/inspections/new`}>
+            <Button variant="secondary">Add inspection</Button>
+          </Link>
         </div>
       </div>
 
@@ -61,7 +67,7 @@ export default async function PropertyDetailPage({
           <CardHeader>
             <CardTitle>Evidence timeline</CardTitle>
             <CardDescription>
-              Every artifact strengthens defensibility. Notes are supported today; photo/video/doc ingestion is next.
+              Every artifact strengthens defensibility. Add notes, URLs, timestamps, and integrity hashes.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -137,19 +143,61 @@ export default async function PropertyDetailPage({
                 Inspections and claims tie evidence to lifecycle decisions.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="text-xs text-zinc-600 dark:text-zinc-400">Status</div>
-                <div className="mt-1 text-sm font-semibold">{property.status}</div>
+            <CardContent className="space-y-4">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className="text-xs text-zinc-600 dark:text-zinc-400">Status</div>
+                  <div className="mt-1 text-sm font-semibold">{property.status}</div>
+                </div>
+                <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className="text-xs text-zinc-600 dark:text-zinc-400">Inspections</div>
+                  <div className="mt-1 text-sm font-semibold">{property.inspections.length}</div>
+                </div>
+                <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className="text-xs text-zinc-600 dark:text-zinc-400">Claims</div>
+                  <div className="mt-1 text-sm font-semibold">{property.claims.length}</div>
+                </div>
               </div>
-              <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="text-xs text-zinc-600 dark:text-zinc-400">Inspections</div>
-                <div className="mt-1 text-sm font-semibold">{property.inspections.length}</div>
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                  Recent inspections
+                </div>
+                <Link href={`/properties/${propertyId}/inspections/new`}>
+                  <Button size="sm" variant="secondary">
+                    New inspection
+                  </Button>
+                </Link>
               </div>
-              <div className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
-                <div className="text-xs text-zinc-600 dark:text-zinc-400">Claims</div>
-                <div className="mt-1 text-sm font-semibold">{property.claims.length}</div>
-              </div>
+
+              {property.inspections.length === 0 ? (
+                <div className="rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/30 dark:text-zinc-400">
+                  No inspections yet. Create an inspection to anchor what was observed and when.
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {property.inspections.map((i) => (
+                    <div
+                      key={i.id}
+                      className="rounded-md border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                            {i.inspectorName}
+                          </div>
+                          <div className="text-xs text-zinc-600 dark:text-zinc-400">
+                            {new Date(i.performedAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">
+                        {i.summary}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
