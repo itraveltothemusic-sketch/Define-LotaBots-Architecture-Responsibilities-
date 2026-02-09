@@ -77,6 +77,20 @@ Copy the template and fill in values:
 - Set `DATABASE_URL` to your Neon Postgres connection string
 - Set `AUTH_SECRET` to a strong random value
 
+### 2b) Initialize database (recommended)
+
+Once `DATABASE_URL` is set:
+
+```bash
+npm --workspace apps/web run db:migrate
+npm --workspace apps/web run db:seed
+```
+
+Seeded credentials (development only):
+
+- `internal@equitybuilders.local` / `ChangeMeNow!` (role: Internal)
+- `owner@equitybuilders.local` / `ChangeMeNow!` (role: Owner)
+
 ### 3) Run the app
 
 ```bash
@@ -84,6 +98,14 @@ npm run dev
 ```
 
 Then open `http://localhost:3000`.
+
+### 4) Quality checks
+
+```bash
+npm run lint
+npm run build
+npm test
+```
 
 ## Modules (build order)
 
