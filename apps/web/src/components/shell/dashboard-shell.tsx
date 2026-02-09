@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { SignOutButton } from "@/components/shell/sign-out-button";
 import { cn } from "@/lib/cn";
 import type { Role } from "@prisma/client";
+import { canAccessModule } from "@/server/auth/rbac";
 
 type NavItem = {
   href: string;
@@ -67,7 +68,7 @@ export function DashboardShell({
               <SignOutButton />
             </div>
             <div className="mt-4 space-y-1">
-              {NAV.map((item) => {
+              {NAV.filter((item) => canAccessModule(user.role, item.module)).map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link

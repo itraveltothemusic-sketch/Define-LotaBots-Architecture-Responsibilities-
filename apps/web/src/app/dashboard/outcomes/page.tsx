@@ -1,6 +1,12 @@
+import { redirect } from "next/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { requireUser } from "@/server/auth/require-user";
+import { canAccessModule } from "@/server/auth/rbac";
 
-export default function OutcomesPage() {
+export default async function OutcomesPage() {
+  const session = await requireUser();
+  if (!canAccessModule(session.user.role, "outcome")) redirect("/unauthorized");
+
   return (
     <div className="space-y-4">
       <Card>
