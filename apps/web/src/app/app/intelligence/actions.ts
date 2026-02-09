@@ -1,3 +1,5 @@
+"use server";
+
 import { z } from "zod";
 import { generateAtosGuidance } from "@/server/atos/engine";
 import { getPropertyCase } from "@/server/demo/property-cases";
@@ -16,8 +18,6 @@ export async function askAtosAction(
   _prev: AskAtosState,
   formData: FormData,
 ): Promise<AskAtosState> {
-  "use server";
-
   const parsed = AskSchema.safeParse({
     propertyId: formData.get("propertyId"),
     question: formData.get("question"),

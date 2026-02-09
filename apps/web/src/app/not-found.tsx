@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -12,18 +14,18 @@ export default function NotFound() {
           If you expected to see a module here, it may not be wired yet.
         </p>
         <div className="mt-8 flex gap-3">
-          <a
+          <Link
             href="/"
             className="rounded-xl bg-white/5 px-4 py-2 text-sm font-semibold text-zinc-100 ring-1 ring-white/10 hover:bg-white/10"
           >
             Go to landing
-          </a>
-          <a
+          </Link>
+          <Link
             href="/app"
             className="rounded-xl bg-emerald-400 px-4 py-2 text-sm font-semibold text-zinc-950 hover:bg-emerald-300"
           >
             Go to app
-          </a>
+          </Link>
         </div>
       </main>
     </div>

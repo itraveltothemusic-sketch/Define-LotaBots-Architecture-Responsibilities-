@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function DocsPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50">
@@ -12,7 +14,7 @@ export default function DocsPage() {
         </p>
 
         <div className="mt-10 grid gap-4">
-          <a
+          <Link
             href="/docs/architecture"
             className="rounded-2xl bg-white/5 p-5 ring-1 ring-white/10 hover:bg-white/10"
           >
@@ -22,16 +24,16 @@ export default function DocsPage() {
             <div className="mt-1 text-sm text-zinc-300">
               Trust model, module boundaries, and how ATOS stays explainable.
             </div>
-          </a>
+          </Link>
         </div>
 
         <div className="mt-10">
-          <a
+          <Link
             href="/"
             className="text-sm font-semibold text-emerald-300 hover:text-emerald-200"
           >
             ← Back to landing
-          </a>
+          </Link>
         </div>
       </main>
     </div>
