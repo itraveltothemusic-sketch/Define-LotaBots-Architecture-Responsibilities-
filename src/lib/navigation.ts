@@ -1,10 +1,11 @@
 import type { AppModule } from "@/lib/auth/permissions";
 
 export type NavIconKey = "radar" | "building" | "shield" | "hammer" | "chart";
+export type AppRoute = "/dashboard" | "/forensic" | "/insurance" | "/execution" | "/equity";
 
 export interface NavItem {
   label: string;
-  href: string;
+  href: AppRoute;
   module: AppModule;
   icon: NavIconKey;
   shortDescription: string;
