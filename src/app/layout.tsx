@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 
 /**
@@ -6,7 +7,17 @@ import "@/styles/globals.css";
  *
  * This is the outermost layout wrapping every page.
  * It provides the HTML shell, metadata, and global providers.
+ *
+ * Using next/font/google for Inter — optimized font loading
+ * with zero layout shift and automatic self-hosting.
  */
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
 export const metadata: Metadata = {
   title: "Equity Builders — Forensic Property Intelligence",
   description:
@@ -27,21 +38,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        {/* Inter font — clean, professional, high readability */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body className="min-h-screen bg-white text-slate-900 antialiased">
+    <html lang="en" className={inter.variable}>
+      <body className={`${inter.className} min-h-screen bg-white text-slate-900 antialiased`}>
         {children}
       </body>
     </html>
