@@ -55,7 +55,8 @@ export function authenticateFromDemoDirectory(
     return null;
   }
 
-  const { password: _password, ...safeUser } = user;
+  const { password: storedPassword, ...safeUser } = user;
+  void storedPassword;
   return safeUser;
 }
 
@@ -111,5 +112,9 @@ export function buildSafeRedirectPath(pathValue: string | null | undefined) {
 }
 
 export function getDemoDirectoryUsers() {
-  return demoDirectory.map(({ password: _password, ...safeUser }) => safeUser);
+  return demoDirectory.map((entry) => {
+    const { password, ...safeUser } = entry;
+    void password;
+    return safeUser;
+  });
 }
