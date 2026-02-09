@@ -1,6 +1,5 @@
-/* eslint-disable no-console */
-const bcrypt = require("bcryptjs");
-const { PrismaClient } = require("@prisma/client");
+import bcrypt from "bcryptjs";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,29 +8,26 @@ const prisma = new PrismaClient();
  * - Deterministic, explicit, and safe for local/dev environments.
  * - Creates an organization + an OWNER user and an INTERNAL user.
  *
- * NOTE: This is not production provisioning. Production will use invites/SO-based flows.
+ * NOTE: This is not production provisioning. Production will use invites/SSO-based flows.
  */
 async function main() {
   const orgName = process.env.SEED_ORG_NAME || "Equity Builders (Dev)";
 
-  const ownerEmail = process.env.SEED_OWNER_EMAIL || "owner@equitybuilders.local";
+  const ownerEmail = (process.env.SEED_OWNER_EMAIL || "owner@equitybuilders.local").toLowerCase();
   const ownerName = process.env.SEED_OWNER_NAME || "Dev Owner";
-  const ownerPassword =
-    process.env.SEED_OWNER_PASSWORD || "ChangeMeNow_123456";
+  const ownerPassword = process.env.SEED_OWNER_PASSWORD || "ChangeMeNow_123456";
 
-  const internalEmail =
-    process.env.SEED_INTERNAL_EMAIL || "internal@equitybuilders.local";
+  const internalEmail = (process.env.SEED_INTERNAL_EMAIL || "internal@equitybuilders.local").toLowerCase();
   const internalName = process.env.SEED_INTERNAL_NAME || "Internal Analyst";
-  const internalPassword =
-    process.env.SEED_INTERNAL_PASSWORD || "ChangeMeNow_123456";
+  const internalPassword = process.env.SEED_INTERNAL_PASSWORD || "ChangeMeNow_123456";
 
-  const ownerHash = await bcrypt.hash(ownerPassword, 12);
-  const internalHash = await bcrypt.hash(internalPassword, 12);
+  const [ownerHash, internalHash] = await Promise.all([
+    bcrypt.hash(ownerPassword, 12),
+    bcrypt.hash(internalPassword, 12),
+  ]);
 
   let org = await prisma.organization.findFirst({ where: { name: orgName } });
-  if (!org) {
-    org = await prisma.organization.create({ data: { name: orgName } });
-  }
+  if (!org) org = await prisma.organization.create({ data: { name: orgName } });
 
   const owner = await prisma.user.upsert({
     where: { email: ownerEmail },
@@ -42,11 +38,7 @@ async function main() {
   const internal = await prisma.user.upsert({
     where: { email: internalEmail },
     update: { name: internalName, passwordHash: internalHash },
-    create: {
-      email: internalEmail,
-      name: internalName,
-      passwordHash: internalHash,
-    },
+    create: { email: internalEmail, name: internalName, passwordHash: internalHash },
   });
 
   await prisma.membership.upsert({

@@ -32,7 +32,7 @@ export function AtosPanel() {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = (await res.json()) as Guidance;
         if (!cancelled) setData(json);
-      } catch (e) {
+      } catch {
         if (!cancelled) setError("ATOS guidance is unavailable right now.");
       } finally {
         if (!cancelled) setLoading(false);

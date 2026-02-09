@@ -21,7 +21,7 @@ export function MarketingHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">
-          <a
+          <Link
             href="/#platform"
             className={cn(
               "text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
@@ -29,19 +29,19 @@ export function MarketingHeader() {
             )}
           >
             Platform
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#trust"
             className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           >
             Trust
-          </a>
-          <a
+          </Link>
+          <Link
             href="/#modules"
             className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           >
             Modules
-          </a>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">

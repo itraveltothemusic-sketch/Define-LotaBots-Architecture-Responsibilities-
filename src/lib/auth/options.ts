@@ -4,6 +4,38 @@ import { prisma } from "@/db/prisma";
 import { SignInSchema } from "@/lib/validation/auth";
 import { verifyPassword } from "@/lib/security/password";
 
+type AuthenticatedUserShape = {
+  id: string;
+  email: string;
+  name: string;
+  orgId: string | null;
+  orgName: string | null;
+  role: "OWNER" | "CONTRACTOR" | "ADJUSTER" | "INTERNAL" | null;
+};
+
+function isAuthenticatedUserShape(value: unknown): value is AuthenticatedUserShape {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.id === "string" &&
+    typeof v.email === "string" &&
+    (typeof v.orgId === "string" || v.orgId === null || typeof v.orgId === "undefined") &&
+    (typeof v.orgName === "string" || v.orgName === null || typeof v.orgName === "undefined") &&
+    (typeof v.role === "string" || v.role === null || typeof v.role === "undefined")
+  );
+}
+
+type HeadersLike = Headers | Record<string, string | string[] | undefined>;
+function getHeader(req: unknown, key: string): string | null {
+  const headers = (req as { headers?: HeadersLike } | null)?.headers;
+  if (!headers) return null;
+  if (typeof (headers as Headers).get === "function") return (headers as Headers).get(key);
+  const h = headers as Record<string, string | string[] | undefined>;
+  const value = h[key] ?? h[key.toLowerCase()];
+  if (!value) return null;
+  return Array.isArray(value) ? value[0] ?? null : value;
+}
+
 /**
  * NextAuth configuration (Credentials).
  *
@@ -40,13 +72,8 @@ export const authOptions: NextAuthOptions = {
         const primary = user.memberships[0];
 
         // Audit sign-in (best-effort). Never block auth on audit logging.
-        const headers: any = (req as any)?.headers ?? {};
-        const xff =
-          typeof headers.get === "function"
-            ? headers.get("x-forwarded-for")
-            : headers["x-forwarded-for"];
-        const ua =
-          typeof headers.get === "function" ? headers.get("user-agent") : headers["user-agent"];
+        const xff = getHeader(req, "x-forwarded-for");
+        const ua = getHeader(req, "user-agent");
 
         prisma.auditEvent
           .create({
@@ -57,8 +84,8 @@ export const authOptions: NextAuthOptions = {
               eventType: "AUTH_SIGNIN",
               resourceType: "user",
               resourceId: user.email,
-              ip: (typeof xff === "string" ? xff.split(",")[0] : null) ?? null,
-              userAgent: (typeof ua === "string" ? ua : null) ?? null,
+              ip: xff ? xff.split(",")[0] : null,
+              userAgent: ua,
             },
           })
           .catch(() => {});
@@ -76,20 +103,20 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.userId = (user as any).id;
-        token.orgId = (user as any).orgId;
-        token.orgName = (user as any).orgName;
-        token.role = (user as any).role;
+      if (user && isAuthenticatedUserShape(user)) {
+        token.userId = user.id;
+        token.orgId = user.orgId;
+        token.orgName = user.orgName;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.userId as string;
-        session.user.orgId = (token.orgId as string | null) ?? null;
-        session.user.orgName = (token.orgName as string | null) ?? null;
-        session.user.role = (token.role as any) ?? null;
+        session.user.id = token.userId ?? session.user.id;
+        session.user.orgId = token.orgId ?? null;
+        session.user.orgName = token.orgName ?? null;
+        session.user.role = token.role ?? null;
       }
       return session;
     },

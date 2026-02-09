@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignInForm } from "./SignInForm";
 
@@ -29,7 +30,15 @@ export default function SignInPage() {
               See <span className="font-medium">.env.example</span>.
             </div>
           ) : null}
-          <SignInForm disabled={!dbConfigured} />
+          <Suspense
+            fallback={
+              <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                Loading sign-in…
+              </div>
+            }
+          >
+            <SignInForm disabled={!dbConfigured} />
+          </Suspense>
         </CardContent>
       </Card>
 
