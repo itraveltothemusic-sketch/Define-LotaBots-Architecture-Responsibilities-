@@ -1,2 +1,11 @@
-# Define-LotaBots-Architecture-Responsibilities-
-This issue defines the complete LotaBots system used to build, maintain, and operate the Equity Builders platform. Each bot has a strict scope to prevent overlap, logic drift, and uncontrolled behavior.  No implementation should proceed without respecting these boundaries.
+# Equity Builders
+
+Forensic Property Intelligence Platform. See [`equity-builders/README.md`](equity-builders/README.md) for full documentation.
+
+## Quick Start
+
+```bash
+cd equity-builders
+npm install
+npm run dev
+```

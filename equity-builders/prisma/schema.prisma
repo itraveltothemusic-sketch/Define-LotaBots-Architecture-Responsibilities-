@@ -1,0 +1,486 @@
+// ──────────────────────────────────────────────────────────────
+// Equity Builders — Database Schema
+// 
+// This schema models the complete forensic property intelligence
+// pipeline: from initial property intake through inspection,
+// insurance claims, contractor execution, and equity verification.
+//
+// Design decisions:
+// - UUIDs for all IDs (no sequential exposure)
+// - Timestamps on everything (audit trail is critical)
+// - JSON fields for flexible metadata (inspection details, etc.)
+// - Enums for all status fields (type safety + DB constraints)
+// ──────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ──────────────────────────────────────────────────
+
+enum UserRole {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum PropertyStatus {
+  INTAKE
+  INSPECTION
+  CLAIM_FILED
+  UNDER_REVIEW
+  APPROVED
+  IN_REPAIR
+  COMPLETED
+  EQUITY_VERIFIED
+}
+
+enum PropertyType {
+  COMMERCIAL
+  INDUSTRIAL
+  MIXED_USE
+  RETAIL
+  OFFICE
+  WAREHOUSE
+}
+
+enum InspectionType {
+  INITIAL
+  FOLLOW_UP
+  FINAL
+  SUPPLEMENTAL
+}
+
+enum DamageSeverity {
+  NONE
+  MINOR
+  MODERATE
+  SEVERE
+  CATASTROPHIC
+}
+
+enum DamageType {
+  WIND
+  HAIL
+  WATER
+  STRUCTURAL
+  ROOF
+  FACADE
+  INTERIOR
+  ELECTRICAL
+  HVAC
+  OTHER
+}
+
+enum ClaimStatus {
+  DRAFT
+  SUBMITTED
+  ACKNOWLEDGED
+  UNDER_REVIEW
+  ADDITIONAL_INFO_REQUESTED
+  APPROVED
+  PARTIALLY_APPROVED
+  DENIED
+  APPEALED
+  SETTLED
+}
+
+enum ContractorStatus {
+  PENDING
+  APPROVED
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  VERIFIED
+  REJECTED
+}
+
+enum MediaType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  REPORT
+}
+
+enum InteractionType {
+  CALL
+  EMAIL
+  LETTER
+  MEETING
+  INSPECTION
+  NOTE
+}
+
+enum InsightType {
+  RISK
+  OPPORTUNITY
+  GAP
+  RECOMMENDATION
+  ALERT
+}
+
+enum InsightSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// ─── Models ─────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         UserRole
+  organization String?
+  phone        String?
+  avatarUrl    String?  @map("avatar_url")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  ownedProperties Property[]           @relation("PropertyOwner")
+  inspections     Inspection[]         @relation("InspectionInspector")
+  contractor      Contractor?
+  mediaUploads    Media[]              @relation("MediaUploader")
+  interactions    CarrierInteraction[] @relation("InteractionRecorder")
+  progressChecks  ProgressUpdate[]     @relation("ProgressVerifier")
+  complianceChecks ComplianceCheck[]   @relation("ComplianceChecker")
+  equityVerifications EquityOutcome[]  @relation("EquityVerifier")
+  atosConversations   ATOSConversation[] @relation("ATOSUser")
+
+  @@map("users")
+}
+
+model Property {
+  id              String         @id @default(uuid())
+  address         String
+  city            String
+  state           String
+  zipCode         String         @map("zip_code")
+  propertyType    PropertyType   @map("property_type")
+  status          PropertyStatus @default(INTAKE)
+  ownerId         String         @map("owner_id")
+  yearBuilt       Int?           @map("year_built")
+  squareFootage   Int?           @map("square_footage")
+  roofType        String?        @map("roof_type")
+  lastInspectionDate DateTime?   @map("last_inspection_date")
+  estimatedValue  Decimal?       @map("estimated_value") @db.Decimal(12, 2)
+  verifiedValue   Decimal?       @map("verified_value") @db.Decimal(12, 2)
+  latitude        Decimal?       @db.Decimal(10, 7)
+  longitude       Decimal?       @db.Decimal(10, 7)
+  metadata        Json?          @default("{}")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  // Relations
+  owner           User               @relation("PropertyOwner", fields: [ownerId], references: [id])
+  inspections     Inspection[]
+  claims          InsuranceClaim[]
+  assignments     ContractorAssignment[]
+  equityOutcome   EquityOutcome?
+  media           Media[]            @relation("PropertyMedia")
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([city, state])
+  @@map("properties")
+}
+
+model Inspection {
+  id              String          @id @default(uuid())
+  propertyId      String          @map("property_id")
+  inspectorId     String          @map("inspector_id")
+  type            InspectionType
+  scheduledDate   DateTime        @map("scheduled_date")
+  completedDate   DateTime?       @map("completed_date")
+  findings        String          @default("")
+  overallSeverity DamageSeverity  @default(NONE) @map("overall_severity")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  property        Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  inspector       User            @relation("InspectionInspector", fields: [inspectorId], references: [id])
+  damageItems     DamageItem[]
+  media           Media[]         @relation("InspectionMedia")
+
+  @@index([propertyId])
+  @@index([inspectorId])
+  @@map("inspections")
+}
+
+model DamageItem {
+  id                       String         @id @default(uuid())
+  inspectionId             String         @map("inspection_id")
+  damageType               DamageType     @map("damage_type")
+  severity                 DamageSeverity
+  location                 String
+  description              String
+  estimatedCost            Decimal?       @map("estimated_cost") @db.Decimal(10, 2)
+  classificationConfidence Float?         @map("classification_confidence")
+  mediaIds                 String[]       @map("media_ids")
+  createdAt                DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  inspection               Inspection     @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([inspectionId])
+  @@map("damage_items")
+}
+
+model Media {
+  id           String    @id @default(uuid())
+  url          String
+  thumbnailUrl String?   @map("thumbnail_url")
+  type         MediaType
+  caption      String?
+  metadata     Json?     @default("{}")
+  uploadedById String    @map("uploaded_by_id")
+  propertyId   String?   @map("property_id")
+  inspectionId String?   @map("inspection_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  uploadedBy   User       @relation("MediaUploader", fields: [uploadedById], references: [id])
+  property     Property?  @relation("PropertyMedia", fields: [propertyId], references: [id], onDelete: Cascade)
+  inspection   Inspection? @relation("InspectionMedia", fields: [inspectionId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([inspectionId])
+  @@map("media")
+}
+
+model InsuranceClaim {
+  id                String      @id @default(uuid())
+  propertyId        String      @map("property_id")
+  claimNumber       String?     @unique @map("claim_number")
+  carrier           String
+  policyNumber      String      @map("policy_number")
+  status            ClaimStatus @default(DRAFT)
+  filedDate         DateTime    @map("filed_date")
+  claimedAmount     Decimal     @map("claimed_amount") @db.Decimal(12, 2)
+  approvedAmount    Decimal?    @map("approved_amount") @db.Decimal(12, 2)
+  discrepancyAmount Decimal?    @map("discrepancy_amount") @db.Decimal(12, 2)
+  adjusterName      String?     @map("adjuster_name")
+  adjusterEmail     String?     @map("adjuster_email")
+  adjusterPhone     String?     @map("adjuster_phone")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  property          Property            @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  interactions      CarrierInteraction[]
+  scopeComparisons  ScopeComparison[]
+
+  @@index([propertyId])
+  @@index([status])
+  @@map("insurance_claims")
+}
+
+model CarrierInteraction {
+  id           String          @id @default(uuid())
+  claimId      String          @map("claim_id")
+  date         DateTime
+  type         InteractionType
+  summary      String
+  outcome      String?
+  attachments  String[]        @default([])
+  recordedById String          @map("recorded_by_id")
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  claim        InsuranceClaim  @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  recordedBy   User            @relation("InteractionRecorder", fields: [recordedById], references: [id])
+
+  @@index([claimId])
+  @@map("carrier_interactions")
+}
+
+model ScopeComparison {
+  id             String         @id @default(uuid())
+  claimId        String         @map("claim_id")
+  forensicItem   String         @map("forensic_item")
+  forensicAmount Decimal        @map("forensic_amount") @db.Decimal(10, 2)
+  carrierItem    String?        @map("carrier_item")
+  carrierAmount  Decimal?       @map("carrier_amount") @db.Decimal(10, 2)
+  variance       Decimal        @db.Decimal(10, 2)
+  notes          String?
+  createdAt      DateTime       @default(now()) @map("created_at")
+
+  // Relations
+  claim          InsuranceClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@index([claimId])
+  @@map("scope_comparisons")
+}
+
+model Contractor {
+  id                    String           @id @default(uuid())
+  userId                String           @unique @map("user_id")
+  companyName           String           @map("company_name")
+  licenseNumber         String           @map("license_number")
+  insuranceCarrier      String           @map("insurance_carrier")
+  insurancePolicyNumber String           @map("insurance_policy_number")
+  specialties           String[]         @default([])
+  status                ContractorStatus @default(PENDING)
+  rating                Float?
+  completedProjects     Int              @default(0) @map("completed_projects")
+  createdAt             DateTime         @default(now()) @map("created_at")
+  updatedAt             DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  user                  User                   @relation(fields: [userId], references: [id])
+  assignments           ContractorAssignment[]
+
+  @@map("contractors")
+}
+
+model ContractorAssignment {
+  id              String           @id @default(uuid())
+  contractorId    String           @map("contractor_id")
+  propertyId      String           @map("property_id")
+  scopeOfWork     String           @map("scope_of_work")
+  estimatedCost   Decimal          @map("estimated_cost") @db.Decimal(10, 2)
+  actualCost      Decimal?         @map("actual_cost") @db.Decimal(10, 2)
+  status          AssignmentStatus @default(ASSIGNED)
+  startDate       DateTime?        @map("start_date")
+  completionDate  DateTime?        @map("completion_date")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  contractor      Contractor       @relation(fields: [contractorId], references: [id])
+  property        Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  progressUpdates ProgressUpdate[]
+  complianceChecks ComplianceCheck[]
+
+  @@index([contractorId])
+  @@index([propertyId])
+  @@map("contractor_assignments")
+}
+
+model ProgressUpdate {
+  id              String               @id @default(uuid())
+  assignmentId    String               @map("assignment_id")
+  date            DateTime             @default(now())
+  percentComplete Int                  @map("percent_complete")
+  description     String
+  mediaIds        String[]             @default([]) @map("media_ids")
+  verifiedById    String?              @map("verified_by_id")
+  createdAt       DateTime             @default(now()) @map("created_at")
+
+  // Relations
+  assignment      ContractorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  verifiedBy      User?                @relation("ProgressVerifier", fields: [verifiedById], references: [id])
+
+  @@index([assignmentId])
+  @@map("progress_updates")
+}
+
+model ComplianceCheck {
+  id           String               @id @default(uuid())
+  assignmentId String               @map("assignment_id")
+  checkType    String               @map("check_type")
+  status       String               @default("PENDING") // PASSED, FAILED, PENDING
+  notes        String?
+  checkedById  String               @map("checked_by_id")
+  checkedAt    DateTime             @default(now()) @map("checked_at")
+
+  // Relations
+  assignment   ContractorAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  checkedBy    User                 @relation("ComplianceChecker", fields: [checkedById], references: [id])
+
+  @@index([assignmentId])
+  @@map("compliance_checks")
+}
+
+model EquityOutcome {
+  id              String   @id @default(uuid())
+  propertyId      String   @unique @map("property_id")
+  preEventValue   Decimal  @map("pre_event_value") @db.Decimal(12, 2)
+  claimTotal      Decimal  @map("claim_total") @db.Decimal(12, 2)
+  repairCosts     Decimal  @map("repair_costs") @db.Decimal(12, 2)
+  postRepairValue Decimal  @map("post_repair_value") @db.Decimal(12, 2)
+  equityGain      Decimal  @map("equity_gain") @db.Decimal(12, 2)
+  roiPercent      Float    @map("roi_percent")
+  narrative       String?
+  isVerified      Boolean  @default(false) @map("is_verified")
+  verifiedById    String?  @map("verified_by_id")
+  verifiedAt      DateTime? @map("verified_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  verifiedBy      User?    @relation("EquityVerifier", fields: [verifiedById], references: [id])
+
+  @@map("equity_outcomes")
+}
+
+// ─── ATOS Intelligence ──────────────────────────────────────
+
+model ATOSConversation {
+  id        String        @id @default(uuid())
+  userId    String        @map("user_id")
+  title     String?
+  context   String?       // JSON string with context references
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user      User          @relation("ATOSUser", fields: [userId], references: [id])
+  messages  ATOSMessage[]
+
+  @@index([userId])
+  @@map("atos_conversations")
+}
+
+model ATOSMessage {
+  id             String           @id @default(uuid())
+  conversationId String           @map("conversation_id")
+  role           String           // "user", "assistant", "system"
+  content        String
+  references     Json?            @default("{}") // Related entity references
+  createdAt      DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  conversation   ATOSConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@map("atos_messages")
+}
+
+model ATOSInsight {
+  id                String          @id @default(uuid())
+  type              InsightType
+  severity          InsightSeverity
+  title             String
+  description       String
+  actionable        Boolean         @default(true)
+  suggestedAction   String?         @map("suggested_action")
+  relatedEntityId   String?         @map("related_entity_id")
+  relatedEntityType String?         @map("related_entity_type")
+  isDismissed       Boolean         @default(false) @map("is_dismissed")
+  createdAt         DateTime        @default(now()) @map("created_at")
+
+  @@index([type])
+  @@index([relatedEntityId])
+  @@map("atos_insights")
+}
