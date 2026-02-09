@@ -26,7 +26,7 @@ export default function ATOSPage() {
     {
       id: '1',
       type: 'atos',
-      content: 'Hello! I'm ATOS, your forensic intelligence assistant. I'm here to guide you through property damage assessment, insurance claims, and equity optimization. How can I help you today?',
+      content: 'Hello! I am ATOS, your forensic intelligence assistant. I am here to guide you through property damage assessment, insurance claims, and equity optimization. How can I help you today?',
       timestamp: new Date(),
     },
   ]);

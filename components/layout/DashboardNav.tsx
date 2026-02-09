@@ -10,7 +10,7 @@ import {
   Users, 
   TrendingUp,
   Bell,
-  User,
+  User as UserIcon,
   LogOut,
   Settings,
   Brain
@@ -93,7 +93,7 @@ export function DashboardNav({ user }: DashboardNavProps) {
                     href="/dashboard/profile"
                     className="flex items-center space-x-3 px-3 py-2 text-sm text-dark-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                   >
-                    <User className="w-4 h-4" />
+                    <UserIcon className="w-4 h-4" />
                     <span>Profile</span>
                   </Link>
                   <Link

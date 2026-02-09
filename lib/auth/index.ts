@@ -62,7 +62,7 @@ export function createToken(user: User): string {
   };
 
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: '7d',
   });
 }
 
@@ -125,17 +125,17 @@ export async function authenticateUser(
   password: string
 ): Promise<User | null> {
   // Find user by email
-  const user = await queryOne<User>(
+  const dbUser = await queryOne<User & { password_hash: string }>(
     'SELECT * FROM users WHERE email = $1 AND is_active = true',
     [email]
   );
 
-  if (!user) {
+  if (!dbUser) {
     return null;
   }
 
   // Verify password
-  const isValid = await verifyPassword(password, user.passwordHash as unknown as string);
+  const isValid = await verifyPassword(password, dbUser.password_hash);
   if (!isValid) {
     return null;
   }
@@ -143,10 +143,12 @@ export async function authenticateUser(
   // Update last login
   await query(
     'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
-    [user.id]
+    [dbUser.id]
   );
 
-  return user;
+  // Remove password_hash before returning
+  const { password_hash: _, ...user } = dbUser;
+  return user as User;
 }
 
 /**

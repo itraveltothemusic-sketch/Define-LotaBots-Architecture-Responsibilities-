@@ -52,7 +52,7 @@ export default async function IntelligenceCenterPage() {
       <div>
         <h1 className="text-3xl font-bold text-dark-900">Intelligence Center</h1>
         <p className="text-dark-600 mt-2">
-          Welcome back, {user?.firstName}. Here's your property portfolio overview.
+          Welcome back, {user?.firstName}. Here is your property portfolio overview.
         </p>
       </div>
 
