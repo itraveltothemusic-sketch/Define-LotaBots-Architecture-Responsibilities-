@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+
+# env / secrets
+.env
+.env.*
+!.env.example
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
