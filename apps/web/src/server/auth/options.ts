@@ -1,6 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import { z } from "zod";
 
 import { getDb } from "@/server/db";
@@ -30,10 +29,6 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   secret: process.env.AUTH_SECRET,
-  adapter: (() => {
-    const db = getDb();
-    return db ? PrismaAdapter(db) : undefined;
-  })(),
   providers: [
     CredentialsProvider({
       name: "Email & Password",

@@ -13,7 +13,6 @@ import { hasDatabaseConfigured } from "@/server/env";
  */
 
 declare global {
-  // eslint-disable-next-line no-var
   var __equityBuildersPrisma: PrismaClient | undefined;
 }
 
