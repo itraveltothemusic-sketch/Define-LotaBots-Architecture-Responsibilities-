@@ -7,7 +7,13 @@
 import jwt from "jsonwebtoken";
 import type { User } from "@/types";
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || "your-secret-key-change-in-production";
+const JWT_SECRET = process.env.JWT_SECRET ?? process.env.NEXTAUTH_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error(
+    "JWT secret is not set. Please define the JWT_SECRET (preferred) or NEXTAUTH_SECRET environment variable."
+  );
+}
 const TOKEN_EXPIRY = "7d"; // 7 days
 
 export interface TokenPayload {
