@@ -19,7 +19,7 @@ import {
 import { formatCurrency, formatDate, formatPercentage } from "@/lib/utils/format";
 
 export default async function EquityOutcomesPage() {
-  const user = await getCurrentUser();
+  await getCurrentUser();
 
   // Mock data - will be replaced with real database queries
   const equityReports = [
