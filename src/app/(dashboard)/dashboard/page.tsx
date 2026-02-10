@@ -4,7 +4,6 @@ import {
   HardHat,
   TrendingUp,
   AlertTriangle,
-  Search,
   ArrowRight,
 } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
