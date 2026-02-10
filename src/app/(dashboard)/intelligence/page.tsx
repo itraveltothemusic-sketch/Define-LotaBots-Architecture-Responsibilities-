@@ -39,7 +39,6 @@ import Link from "next/link";
 export default function IntelligenceCenterPage() {
   const metrics = mockDashboardMetrics;
   const allInsights = mockATOSInsights;
-  const acknowledgedInsights = allInsights.filter((i) => i.acknowledged);
   const pendingInsights = allInsights.filter((i) => !i.acknowledged);
 
   // Calculate portfolio-level intelligence
