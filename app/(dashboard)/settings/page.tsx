@@ -6,7 +6,7 @@
 
 import { auth } from '@/lib/auth/config';
 import { ForensicCard, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { User, Bell, Shield, Key } from 'lucide-react';
+import { User, Bell, Key } from 'lucide-react';
 
 export default async function SettingsPage() {
   const session = await auth();
