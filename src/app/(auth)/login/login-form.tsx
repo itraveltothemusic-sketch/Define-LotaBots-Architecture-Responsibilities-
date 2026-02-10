@@ -101,7 +101,9 @@ export function LoginForm() {
                 {ROLE_LABELS[credential.role]}
               </p>
               <p className="mt-1 text-sm text-slate-200">{credential.email}</p>
-              <p className="mt-1 text-xs text-slate-400">{credential.password}</p>
+              {process.env.NODE_ENV === "development" && (
+                <p className="mt-1 text-xs text-slate-400">{credential.password}</p>
+              )}
             </li>
           ))}
         </ul>
