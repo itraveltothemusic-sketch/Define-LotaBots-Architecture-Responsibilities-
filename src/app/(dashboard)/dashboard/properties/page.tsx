@@ -11,11 +11,9 @@ import { useState } from 'react';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { ATOSPanel } from '@/components/atos/ATOSPanel';
 import { formatCurrency, formatDate, formatSquareFeet } from '@/lib/utils/format';
 import { Building2, Plus, Search, Upload, Camera, FileText, AlertCircle } from 'lucide-react';
-import Link from 'next/link';
 
 // Mock data
 const mockProperties = [
