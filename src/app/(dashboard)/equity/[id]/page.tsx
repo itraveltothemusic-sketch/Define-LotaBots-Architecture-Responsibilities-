@@ -35,9 +35,9 @@ import {
 export default async function EquityDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   const property = mockProperties.find((p) => p.id === id) || mockProperties[0];
   const outcome = mockEquityOutcomes.find((eo) => eo.propertyId === property.id);
