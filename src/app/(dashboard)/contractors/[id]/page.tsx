@@ -60,9 +60,9 @@ const scopeStatusVariant: Record<string, { label: string; variant: "success" | "
 export default async function ContractorDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   const contractor = mockContractors.find((c) => c.id === id) || mockContractors[0];
   const scopes = mockScopeAssignments.filter((s) => s.contractorId === contractor.id);
