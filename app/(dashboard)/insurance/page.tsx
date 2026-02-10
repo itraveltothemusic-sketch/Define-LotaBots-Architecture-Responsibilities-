@@ -24,25 +24,43 @@ export default async function InsuranceClaimsPage() {
   const userRole = session.user.role;
   const userId = session.user.id;
 
-  // Fetch user's properties first
-  const userProperties = userRole === 'internal' || userRole === 'adjuster'
-    ? await db.select().from(properties)
-    : await db.select().from(properties).where(eq(properties.ownerId, userId));
+  let claims;
 
-  const propertyIds = userProperties.map(p => p.id);
-
-  // Fetch claims for these properties
-  const claims = propertyIds.length > 0
-    ? await db.select({
+  if (userRole === 'adjuster') {
+    // Adjusters can only see claims that are explicitly assigned to them
+    claims = await db
+      .select({
         claim: insuranceClaims,
         property: properties,
       })
       .from(insuranceClaims)
       .leftJoin(properties, eq(insuranceClaims.propertyId, properties.id))
-      .where(inArray(insuranceClaims.propertyId, propertyIds))
-      .orderBy(desc(insuranceClaims.updatedAt))
-    : [];
+      .where(eq(insuranceClaims.adjusterId, userId))
+      .orderBy(desc(insuranceClaims.updatedAt));
+  } else {
+    // Fetch user's properties first
+    const userProperties = userRole === 'internal'
+      ? await db.select().from(properties)
+      : await db
+          .select()
+          .from(properties)
+          .where(eq(properties.ownerId, userId));
 
+    const propertyIds = userProperties.map((p) => p.id);
+
+    // Fetch claims for these properties
+    claims = propertyIds.length > 0
+      ? await db
+          .select({
+            claim: insuranceClaims,
+            property: properties,
+          })
+          .from(insuranceClaims)
+          .leftJoin(properties, eq(insuranceClaims.propertyId, properties.id))
+          .where(inArray(insuranceClaims.propertyId, propertyIds))
+          .orderBy(desc(insuranceClaims.updatedAt))
+      : [];
+  }
   // Calculate metrics
   const totalClaimed = claims.reduce((sum, { claim }) => 
     sum + (parseFloat(claim.claimedAmount?.toString() || '0')), 0
