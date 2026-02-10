@@ -8,7 +8,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Building2, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { ArrowLeft, Building2, MapPin, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ForensicCard, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
