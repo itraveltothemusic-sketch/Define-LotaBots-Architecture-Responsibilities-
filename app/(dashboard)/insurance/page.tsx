@@ -88,10 +88,12 @@ export default async function InsuranceClaimsPage() {
             Track claims, analyze discrepancies, and optimize negotiation outcomes
           </p>
         </div>
-        <Link href="/insurance/new" className="btn-primary flex items-center">
-          <Plus className="h-5 w-5 mr-2" />
-          File Claim
-        </Link>
+        {userRole !== 'adjuster' && (
+          <Link href="/insurance/new" className="btn-primary flex items-center">
+            <Plus className="h-5 w-5 mr-2" />
+            File Claim
+          </Link>
+        )}
       </div>
 
       {/* Metrics */}
@@ -156,14 +158,21 @@ export default async function InsuranceClaimsPage() {
       {claims.length === 0 ? (
         <ForensicCard className="text-center py-16">
           <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Claims Yet</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {userRole === 'adjuster' ? 'No Claims Assigned' : 'No Claims Yet'}
+          </h3>
           <p className="text-gray-600 mb-6">
-            Start tracking your insurance claims to maximize recovery outcomes
+            {userRole === 'adjuster' 
+              ? 'You currently have no insurance claims assigned to you'
+              : 'Start tracking your insurance claims to maximize recovery outcomes'
+            }
           </p>
-          <Link href="/insurance/new" className="btn-primary inline-flex items-center">
-            <Plus className="h-5 w-5 mr-2" />
-            File Your First Claim
-          </Link>
+          {userRole !== 'adjuster' && (
+            <Link href="/insurance/new" className="btn-primary inline-flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              File Your First Claim
+            </Link>
+          )}
         </ForensicCard>
       ) : (
         <ForensicCard>
