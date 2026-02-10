@@ -31,7 +31,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (!canAccessRoute(pathname, session.role)) {
-      return NextResponse.redirect(new URL("/platform/intelligence?denied=1", request.url));
+      const fallbackUrl = new URL("/", request.url);
+      fallbackUrl.searchParams.set("denied", "1");
+      return NextResponse.redirect(fallbackUrl);
     }
   }
 
