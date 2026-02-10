@@ -204,8 +204,16 @@ Please provide more context or ask about a specific property, claim, or contract
                   <button
                     key={index}
                     onClick={() => {
-                      setInput(action.question);
-                      handleSubmit(new Event('submit') as any);
+                      const question = action.question;
+                      if (!question || !question.trim()) return;
+                      // Keep the input field in sync with the selected quick action
+                      setInput(question);
+                      // Directly add the user's quick action message instead of
+                      // relying on async state updates + a synthetic submit event
+                      setMessages((prev) => [
+                        ...prev,
+                        { role: 'user', content: question },
+                      ]);
                     }}
                     className="w-full text-left p-3 rounded-lg border border-gray-200 hover:border-forensic-300 hover:bg-forensic-50 transition-colors"
                   >
