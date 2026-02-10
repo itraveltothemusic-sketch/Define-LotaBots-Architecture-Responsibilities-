@@ -7,7 +7,6 @@
 'use client';
 
 import { Bell, Search, User } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
 
 interface HeaderProps {
   title: string;
