@@ -134,7 +134,6 @@ export default async function ATOSIntelligencePage() {
   // Group insights by priority
   const highPriorityInsights = insights.filter((i) => i.priority <= 2);
   const mediumPriorityInsights = insights.filter((i) => i.priority === 3 || i.priority === 4);
-  const lowPriorityInsights = insights.filter((i) => i.priority > 4);
 
   return (
     <div className="p-8 space-y-8">
