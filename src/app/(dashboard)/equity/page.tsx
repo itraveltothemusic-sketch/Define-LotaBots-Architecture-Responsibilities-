@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils";
 import {
   mockProperties,
   mockEquityOutcomes,
-  mockClaims,
 } from "@/lib/db/mock-data";
 import Link from "next/link";
 
