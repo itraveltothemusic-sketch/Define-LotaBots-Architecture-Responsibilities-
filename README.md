@@ -154,14 +154,14 @@ Open `http://localhost:3000`.
 
 ## Bootstrap RBAC accounts (local only)
 
-Use `/login` and one of the seeded accounts:
+For local development, the app seeds role-based accounts you can use to explore the system via `/login`:
 
-- Owner: `owner@equitybuilders.io` / `OwnerPass!2026`
-- Contractor: `contractor@equitybuilders.io` / `ContractorPass!2026`
-- Adjuster: `adjuster@equitybuilders.io` / `AdjusterPass!2026`
-- Internal: `internal@equitybuilders.io` / `InternalPass!2026`
+- Owner (portfolio owner)
+- Contractor (execution partner)
+- Adjuster (carrier-side)
+- Internal (Equity Builders internal)
 
-Replace seeded users with your identity provider and persistent user store before production use.
+Default credentials for these accounts are defined in the local seed configuration or environment (e.g., `.env.local`) and are intended for **local development only**. Do not reuse them in any deployed or shared environment; replace seeded users with your identity provider and persistent user store before production use.
 
 ---
 
