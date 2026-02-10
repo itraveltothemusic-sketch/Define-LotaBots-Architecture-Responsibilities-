@@ -34,6 +34,7 @@ export function Header({ title, subtitle, user }: HeaderProps) {
             <input
               type="text"
               placeholder="Search properties, claims..."
+              aria-label="Search properties and claims"
               className="pl-10 pr-4 py-2 w-80 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
             />
           </div>
