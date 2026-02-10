@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ATOSPanel } from '@/components/atos/ATOSPanel';
 import { formatCurrency, formatDate, formatPercent } from '@/lib/utils/format';
-import { FileText, Plus, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Phone, Mail, Calendar } from 'lucide-react';
+import { FileText, Plus, TrendingDown, AlertTriangle, CheckCircle, Phone, Mail } from 'lucide-react';
 
 // Mock data
 const mockClaims = [
