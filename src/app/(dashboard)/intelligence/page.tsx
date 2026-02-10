@@ -19,9 +19,6 @@ import {
   mockProperties,
   mockClaims,
   mockATOSInsights,
-  mockTimelineEvents,
-  mockScopeAssignments,
-  mockEquityOutcomes,
 } from "@/lib/db/mock-data";
 import Link from "next/link";
 
