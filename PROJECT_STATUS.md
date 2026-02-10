@@ -17,7 +17,7 @@ This is **NOT a demo. NOT an MVP toy.** This is a **serious, scalable, enterpris
 ## 📋 Completed Deliverables
 
 ### ✅ 1. Project Architecture & Infrastructure
-- **Next.js 15** with App Router, TypeScript, and Tailwind CSS
+- **Next.js 16.1.6** with App Router, TypeScript, and Tailwind CSS
 - **Production-grade folder structure** with clear separation of concerns
 - **Turbopack configuration** for optimal build performance
 - **ESLint and TypeScript** strict mode enabled
