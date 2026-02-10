@@ -108,7 +108,7 @@ At the center is **ATOS** (Adaptive Technical Operations Strategist): an embedde
 │   │   ├── data/
 │   │   ├── db/
 │   │   └── repositories/
-│   ├── middleware.ts
+│   ├── proxy.ts
 │   └── types/
 └── README.md
 ```
