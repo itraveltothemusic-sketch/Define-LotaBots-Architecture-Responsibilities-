@@ -28,7 +28,7 @@ export async function registerUser(formData: FormData): Promise<ApiResponse> {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
       name: formData.get("name") as string,
-      role: (formData.get("role") as any) || "owner",
+      role: "owner",
       phone: typeof phoneValue === "string" ? phoneValue : undefined,
       company: typeof companyValue === "string" ? companyValue : undefined,
     };
