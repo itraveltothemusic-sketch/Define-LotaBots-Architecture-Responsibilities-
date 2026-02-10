@@ -16,7 +16,7 @@ import {
   MapPinIcon,
   CalendarIcon,
 } from "@heroicons/react/24/outline";
-import { formatCurrency, formatDate, formatEnumLabel } from "@/lib/utils/format";
+import { formatCurrency, formatDate } from "@/lib/utils/format";
 
 export default async function PropertiesPage() {
   const user = await getCurrentUser();
