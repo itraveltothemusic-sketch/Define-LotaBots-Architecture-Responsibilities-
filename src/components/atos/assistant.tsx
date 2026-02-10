@@ -5,13 +5,11 @@ import {
   Brain,
   Send,
   Sparkles,
-  AlertCircle,
   Lightbulb,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { ATOSMessageRole, ATOSContext } from "@/types";
+import type { ATOSMessageRole } from "@/types";
 
 /**
  * ATOS Assistant — The forensic intelligence interface.
