@@ -55,9 +55,9 @@ const severityConfig: Record<string, { color: string; bg: string; label: string 
 export default async function PropertyDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   // Resolve all data for this property
   const property = mockProperties.find((p) => p.id === id) || mockProperties[0];
