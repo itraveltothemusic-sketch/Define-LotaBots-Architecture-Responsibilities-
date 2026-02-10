@@ -52,9 +52,9 @@ const interactionTypeConfig: Record<string, { icon: React.ElementType; color: st
 export default async function ClaimDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = await params;
+  const { id } = params;
 
   const claim = mockClaims.find((c) => c.id === id) || mockClaims[0];
   const property = mockProperties.find((p) => p.id === claim.propertyId);
