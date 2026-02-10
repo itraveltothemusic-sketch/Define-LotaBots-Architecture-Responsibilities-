@@ -175,14 +175,23 @@ export function ATOSAssistant() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="px-4 py-3 bg-slate-50 rounded-2xl rounded-tl-md">
-                      <div
-                        className="text-sm text-slate-700 leading-relaxed prose prose-sm prose-slate max-w-none"
-                        dangerouslySetInnerHTML={{
-                          __html: msg.content
-                            .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-                            .replace(/\n/g, "<br />"),
-                        }}
-                      />
+                      <div className="text-sm text-slate-700 leading-relaxed prose prose-sm prose-slate max-w-none">
+                        {msg.content.split("\n").map((line, lineIndex) => {
+                          const parts = line.split(/(\*\*.*?\*\*)/g);
+                          return (
+                            <span key={lineIndex}>
+                              {parts.map((part, partIndex) => {
+                                if (part.startsWith("**") && part.endsWith("**")) {
+                                  const boldText = part.slice(2, -2);
+                                  return <strong key={partIndex}>{boldText}</strong>;
+                                }
+                                return <span key={partIndex}>{part}</span>;
+                              })}
+                              {lineIndex !== msg.content.split("\n").length - 1 && <br />}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
                     {/* Confidence & Reasoning toggle */}
                     {msg.confidence !== undefined && (
