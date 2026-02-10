@@ -12,7 +12,7 @@ import { Plus, FileSearch, CheckCircle, Clock, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/Badge';
 import { ForensicCard } from '@/components/ui/Card';
-import { formatDate, formatDateTime } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 
 export default async function InspectionsPage() {
   const session = await auth();
