@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { StatusBadge, getPropertyStatusVariant, getClaimStatusVariant } from "@/components/ui/status-badge";
 import { ATOSInsightPanel } from "@/components/atos/insight-panel";
 import { ATOSAssistant } from "@/components/atos/assistant";
-import { formatCurrency, formatPercentage, formatDate } from "@/lib/utils";
+import { formatCurrency, formatPercentage } from "@/lib/utils";
 import {
   mockDashboardMetrics,
   mockProperties,
