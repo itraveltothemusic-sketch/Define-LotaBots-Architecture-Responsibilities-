@@ -101,7 +101,6 @@ const mockGuidance = {
 
 export default function PropertiesPage() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProperty, setSelectedProperty] = useState<string | null>(null);
 
   return (
     <div className="space-y-8">
