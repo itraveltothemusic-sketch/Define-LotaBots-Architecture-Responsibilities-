@@ -11,7 +11,7 @@ import { Card, CardHeader } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ATOSPanel } from '@/components/atos/ATOSPanel';
-import { formatCurrency, formatDate, formatPercent } from '@/lib/utils/format';
+import { formatCurrency, formatDate } from '@/lib/utils/format';
 import { HardHat, Plus, CheckCircle, Clock, AlertTriangle, Star, Shield, FileCheck } from 'lucide-react';
 
 // Mock data
