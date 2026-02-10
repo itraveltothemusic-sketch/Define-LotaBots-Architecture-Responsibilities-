@@ -154,20 +154,13 @@ equity-builders/
 │   │   ├── schema.ts             # Drizzle schema definitions
 │   │   ├── client.ts             # Database client
 │   │   └── migrations/
-│   ├── auth/                     # Authentication logic
-│   │   ├── config.ts             # NextAuth configuration
-│   │   └── middleware.ts         # Auth middleware
-│   ├── ai/                       # AI/ATOS logic
-│   │   ├── atos.ts               # ATOS assistant core
-│   │   └── prompts.ts            # System prompts
+│   ├── auth/                     # Authentication logic (e.g. NextAuth configuration, middleware)
+│   ├── ai/                       # AI/ATOS logic (e.g. ATOS assistant core, prompts)
 │   └── utils/                    # Utility functions
 │       ├── cn.ts                 # Class name utilities
 │       ├── format.ts             # Formatting helpers
 │       └── validation.ts         # Zod schemas
-├── types/                        # TypeScript type definitions
-│   ├── database.ts
-│   ├── auth.ts
-│   └── modules.ts
+├── types/                        # Shared TypeScript type definitions (database, auth, domain modules)
 ├── public/                       # Static assets
 │   ├── images/
 │   └── icons/
