@@ -68,11 +68,27 @@ export async function POST(request: NextRequest) {
 
     const data = validation.data;
 
+    // Determine and validate ownerId based on role
+    let ownerId: string;
+    if (session.role === 'OWNER') {
+      ownerId = session.userId;
+    } else {
+      // INTERNAL users must explicitly provide a valid ownerId
+      if (typeof body.ownerId !== 'string' || !body.ownerId.trim()) {
+        return errorResponse(
+          'VALIDATION_ERROR',
+          'Invalid input',
+          [{ path: ['ownerId'], message: 'ownerId is required for INTERNAL users', code: 'custom' }]
+        );
+      }
+      ownerId = body.ownerId.trim();
+    }
+
     // Create property
     const [property] = await db
       .insert(properties)
       .values({
-        ownerId: session.role === 'OWNER' ? session.userId : body.ownerId,
+        ownerId,
         name: data.name,
         addressStreet: data.addressStreet,
         addressCity: data.addressCity,
