@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, role } = body;
+    const { email, role } = body;
 
     // TODO: Replace with actual authentication provider
     // This mock authenticates any valid-looking credentials
