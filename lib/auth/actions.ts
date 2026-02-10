@@ -21,13 +21,16 @@ import { redirect } from "next/navigation";
  */
 export async function registerUser(formData: FormData): Promise<ApiResponse> {
   try {
+    const phoneValue = formData.get("phone");
+    const companyValue = formData.get("company");
+
     const data = {
       email: formData.get("email") as string,
       password: formData.get("password") as string,
       name: formData.get("name") as string,
       role: (formData.get("role") as any) || "owner",
-      phone: formData.get("phone") as string,
-      company: formData.get("company") as string,
+      phone: typeof phoneValue === "string" ? phoneValue : undefined,
+      company: typeof companyValue === "string" ? companyValue : undefined,
     };
 
     // Validate input
