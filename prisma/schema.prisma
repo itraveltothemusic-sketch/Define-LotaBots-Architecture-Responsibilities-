@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  fullName   String
+  email      String   @unique
+  role       UserRole
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  properties PropertyMember[]
+}
+
+model Property {
+  id              String   @id @default(cuid())
+  displayName     String
+  ownershipEntity String
+  addressLine1    String
+  city            String
+  state           String
+  zipCode         String
+  grossAreaSqFt   Int
+  occupancyType   OccupancyType
+  stormEvent      String
+  dateOfLoss      DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  members         PropertyMember[]
+  evidence        EvidenceRecord[]
+  inspections     InspectionRecord[]
+}
+
+model PropertyMember {
+  id         String   @id @default(cuid())
+  userId     String
+  propertyId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+}
+
+model EvidenceRecord {
+  id                 String   @id @default(cuid())
+  propertyId         String
+  capturedAt         DateTime
+  evidenceType       EvidenceType
+  title              String
+  capturedBy         String
+  verificationStatus VerificationStatus
+  chainOfCustodyRef  String
+  summary            String
+  createdAt          DateTime @default(now())
+  property           Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+model InspectionRecord {
+  id              String   @id @default(cuid())
+  propertyId      String
+  inspectedAt     DateTime
+  inspector       String
+  findingsSummary String
+  confidenceScore Int
+  createdAt       DateTime @default(now())
+  property        Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  OWNER
+  CONTRACTOR
+  ADJUSTER
+  INTERNAL
+}
+
+enum OccupancyType {
+  RETAIL
+  INDUSTRIAL
+  MIXED_USE
+  OFFICE
+}
+
+enum EvidenceType {
+  PHOTO
+  VIDEO
+  DOCUMENT
+  REPORT
+  CALL_NOTE
+}
+
+enum VerificationStatus {
+  VERIFIED
+  PENDING
+  FLAGGED
+}
