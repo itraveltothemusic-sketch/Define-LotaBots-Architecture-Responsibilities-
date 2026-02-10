@@ -37,7 +37,6 @@ export default function InsurancePage() {
   const totalApproved = mockClaims.reduce((sum, c) => sum + (c.approvedAmount || 0), 0);
   const totalSettled = mockClaims.reduce((sum, c) => sum + (c.settledAmount || 0), 0);
   const totalDiscrepancy = mockClaims.reduce((sum, c) => sum + (c.discrepancyAmount || 0), 0);
-  const activeClaims = mockClaims.filter((c) => c.status !== "settled" && c.status !== "closed");
   const avgRecovery = totalClaimed > 0 ? (totalApproved / totalClaimed) * 100 : 0;
 
   return (
