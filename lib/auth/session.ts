@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 import { db } from "@/lib/db/client";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { verifyToken, TokenPayload } from "./jwt";
+import { verifyToken } from "./jwt";
 import type { User } from "@/types";
 
 const SESSION_COOKIE_NAME = "eb_session";
