@@ -42,5 +42,5 @@ This keeps advisory output audit-ready for engineering, insurers, and investors.
 ## Security posture
 
 - Session payloads are signed with HMAC (`AUTH_SESSION_SECRET`).
-- Sensitive pages are protected both in middleware and server layouts.
+- Sensitive pages are protected in server layouts.
 - Role-based module access is enforced centrally.
