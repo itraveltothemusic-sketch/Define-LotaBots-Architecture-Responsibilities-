@@ -1,0 +1,169 @@
+bot:
+  name: "SecurityBot"
+  version: "1.0.0"
+  enabled: true
+  description: "Security scanning and vulnerability detection"
+  category: "security"
+
+triggers:
+  - type: "event"
+    pattern: "code.committed"
+    priority: "high"
+    
+  - type: "schedule"
+    pattern: "0 0 * * *"  # Daily at midnight
+    priority: "medium"
+
+actions:
+  - name: "scan_dependencies"
+    type: "execute"
+    command: "npm audit --json"
+    timeout: 300
+    on_success: "scan_code"
+    on_failure: "report_vulnerabilities"
+    
+  - name: "scan_code"
+    type: "execute"
+    command: "semgrep scan --config auto"
+    timeout: 600
+    on_success: "scan_secrets"
+    on_failure: "report_vulnerabilities"
+    
+  - name: "scan_secrets"
+    type: "execute"
+    command: "trufflehog filesystem ."
+    timeout: 300
+    on_success: "scan_containers"
+    on_failure: "report_secrets"
+    
+  - name: "scan_containers"
+    type: "execute"
+    command: "trivy image ${container_image}"
+    timeout: 600
+    on_success: "generate_report"
+    on_failure: "report_vulnerabilities"
+    
+  - name: "generate_report"
+    type: "execute"
+    command: "./scripts/generate-security-report.sh"
+    timeout: 120
+    on_success: "publish_report"
+    
+  - name: "publish_report"
+    type: "execute"
+    command: "aws s3 cp security-report.json s3://security-reports/"
+    timeout: 60
+    on_success: "check_threshold"
+    
+  - name: "check_threshold"
+    type: "execute"
+    command: "./scripts/check-security-threshold.sh"
+    timeout: 30
+    on_success: "notify_success"
+    on_failure: "block_deployment"
+    
+  - name: "block_deployment"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "security.failed"
+      severity: "critical"
+      payload:
+        action: "block_deployment"
+        
+  - name: "report_vulnerabilities"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "security.vulnerabilities_found"
+      severity: "critical"
+      
+  - name: "report_secrets"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "security.secrets_found"
+      severity: "critical"
+      
+  - name: "notify_success"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "security.scan_completed"
+
+constraints:
+  max_concurrent_jobs: 5
+  timeout: 1800
+  rate_limit:
+    requests_per_minute: 10
+    burst_size: 5
+  retry_policy:
+    max_attempts: 2
+    backoff: "linear"
+    initial_delay: 10
+    max_delay: 60
+  resource_limits:
+    cpu: "2000m"
+    memory: "4Gi"
+
+dependencies:
+  required: []
+  optional:
+    - "BuildBot"
+  conflicts: []
+
+outputs:
+  - type: "message"
+    destination: "NotificationBot"
+    format: "json"
+    
+  - type: "file"
+    destination: "s3://security-reports/"
+    format: "json"
+    retention: 365
+    
+  - type: "metric"
+    destination: "prometheus"
+    format: "openmetrics"
+
+security:
+  permissions:
+    - resource: "git-repository"
+      actions: ["read"]
+    - resource: "s3://security-reports/"
+      actions: ["write"]
+    - resource: "container-registry"
+      actions: ["read"]
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+  authentication:
+    method: "token"
+
+monitoring:
+  health_check:
+    enabled: true
+    interval: 60
+    endpoint: "/health"
+  metrics:
+    enabled: true
+    push_interval: 60
+  logging:
+    level: "info"
+    format: "json"
+
+notifications:
+  - event: "security.vulnerabilities_found"
+    channels: ["slack", "email"]
+    severity: "critical"
+    template: "Security vulnerabilities found: ${critical_count} critical, ${high_count} high"
+    
+  - event: "security.secrets_found"
+    channels: ["slack", "email", "pagerduty"]
+    severity: "critical"
+    template: "SECRETS DETECTED in repository - Immediate action required"
+    
+  - event: "security.scan_completed"
+    channels: ["slack"]
+    severity: "info"
+    template: "Security scan completed - No critical issues found"

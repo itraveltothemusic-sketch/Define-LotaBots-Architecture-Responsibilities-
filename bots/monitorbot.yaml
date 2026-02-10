@@ -1,0 +1,143 @@
+bot:
+  name: "MonitorBot"
+  version: "1.0.0"
+  enabled: true
+  description: "System monitoring and health checks"
+  category: "operations"
+
+triggers:
+  - type: "schedule"
+    pattern: "*/5 * * * *"  # Every 5 minutes
+    priority: "high"
+    
+  - type: "event"
+    pattern: "deploy.completed"
+    priority: "high"
+
+actions:
+  - name: "check_application_health"
+    type: "execute"
+    command: "curl -f ${app_url}/health"
+    timeout: 30
+    on_success: "check_database_health"
+    on_failure: "alert_health_failure"
+    
+  - name: "check_database_health"
+    type: "execute"
+    command: "./scripts/check-db-health.sh"
+    timeout: 60
+    on_success: "collect_metrics"
+    on_failure: "alert_health_failure"
+    
+  - name: "collect_metrics"
+    type: "execute"
+    command: "./scripts/collect-metrics.sh"
+    timeout: 120
+    on_success: "analyze_metrics"
+    
+  - name: "analyze_metrics"
+    type: "execute"
+    command: "./scripts/analyze-metrics.sh"
+    timeout: 60
+    on_success: "check_anomalies"
+    
+  - name: "check_anomalies"
+    type: "execute"
+    command: "./scripts/detect-anomalies.sh"
+    timeout: 120
+    on_success: "update_dashboard"
+    on_failure: "alert_anomaly"
+    
+  - name: "update_dashboard"
+    type: "execute"
+    command: "./scripts/update-dashboard.sh"
+    timeout: 30
+    
+  - name: "alert_health_failure"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "alert.triggered"
+      severity: "critical"
+      payload:
+        type: "health_check_failed"
+        
+  - name: "alert_anomaly"
+    type: "message"
+    command: "send_message"
+    parameters:
+      event: "alert.triggered"
+      severity: "warning"
+      payload:
+        type: "anomaly_detected"
+
+constraints:
+  max_concurrent_jobs: 10
+  timeout: 300
+  rate_limit:
+    requests_per_minute: 100
+    burst_size: 50
+  retry_policy:
+    max_attempts: 3
+    backoff: "exponential"
+    initial_delay: 5
+    max_delay: 60
+  resource_limits:
+    cpu: "1000m"
+    memory: "2Gi"
+
+dependencies:
+  required: []
+  optional:
+    - "DeployBot"
+  conflicts: []
+
+outputs:
+  - type: "message"
+    destination: "NotificationBot"
+    format: "json"
+    
+  - type: "metric"
+    destination: "prometheus"
+    format: "openmetrics"
+    
+  - type: "metric"
+    destination: "grafana"
+    format: "json"
+
+security:
+  permissions:
+    - resource: "application-endpoints"
+      actions: ["read"]
+    - resource: "database"
+      actions: ["read"]
+    - resource: "metrics-storage"
+      actions: ["write"]
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+  authentication:
+    method: "token"
+
+monitoring:
+  health_check:
+    enabled: true
+    interval: 30
+    endpoint: "/health"
+  metrics:
+    enabled: true
+    push_interval: 30
+  logging:
+    level: "info"
+    format: "json"
+
+notifications:
+  - event: "alert.triggered"
+    channels: ["slack", "pagerduty"]
+    severity: "critical"
+    template: "ALERT: ${type} - ${message}"
+    
+  - event: "anomaly.detected"
+    channels: ["slack"]
+    severity: "warning"
+    template: "Anomaly detected: ${metric_name} - ${deviation}"
