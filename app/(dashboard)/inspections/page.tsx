@@ -21,10 +21,17 @@ export default async function InspectionsPage() {
     return null;
   }
 
-  // Fetch user's properties
-  const userProperties = await db.select().from(properties);
-  const propertyIds = userProperties.map(p => p.id);
+  // Determine user role (used for access control)
+  const user = session.user as any;
+  const isInternalUser = user?.role === 'internal';
 
+  // Fetch user's properties
+  // Internal users can see all properties; other roles see none by default
+  const userProperties = isInternalUser
+    ? await db.select().from(properties)
+    : [];
+
+  const propertyIds = userProperties.map((p: any) => p.id);
   // Fetch inspections
   const allInspections = propertyIds.length > 0
     ? await db.select({
