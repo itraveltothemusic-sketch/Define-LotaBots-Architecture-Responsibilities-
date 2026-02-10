@@ -4,11 +4,9 @@ import {
   AlertTriangle,
   TrendingUp,
   Clock,
-  CheckCircle2,
   ArrowRight,
   BarChart3,
   Shield,
-  Zap,
 } from "lucide-react";
 import { MetricCard } from "@/components/ui/metric-card";
 import { Card } from "@/components/ui/card";
