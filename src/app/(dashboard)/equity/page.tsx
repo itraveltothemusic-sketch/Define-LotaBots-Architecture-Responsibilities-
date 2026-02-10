@@ -37,10 +37,6 @@ import Link from "next/link";
  */
 export default function EquityPage() {
   // Portfolio-level equity calculations
-  const totalPreValue = mockProperties.reduce(
-    (sum, p) => sum + (p.preEventValue || 0),
-    0
-  );
   const propertiesWithPostValue = mockProperties.filter(
     (p) => p.postRestorationValue
   );
