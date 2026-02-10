@@ -100,7 +100,6 @@ ATOS (Adaptive Threat & Opportunity System) is embedded across every module. It 
 equity-builders/
 ├── src/
 │   ├── app/
-│   │   ├── (marketing)/          # Landing page (public)
 │   │   ├── (auth)/               # Login, registration
 │   │   │   ├── login/
 │   │   │   └── register/
